@@ -1,0 +1,38 @@
+1. For creating a book
+POST /api/v1/books HTTP/2.0
+Example-Payload:
+    {
+        "book-name": "Kire bhai ki obosta?",
+        "price": 200,
+        "isbn" : "4323-6456-4756-4564"
+        "authors" : [
+            {
+                "username": "imtiaz"
+            },
+            {
+                "username": "akkas"
+            },
+            {
+                "username": "jakkas"
+            }
+        ],
+        "book-content": {
+            "over-view": "Haire over-view",
+            "chapters" : [
+                {
+                    "chapter-title": "chapter 1",
+                    "chapter-content": "chapter 1 content"
+                },
+                {
+                    "chapter-title": "chapter 2",
+                    "chapter-content": "chapter 2 content"
+                }
+            ]
+        }
+    }
+
+2. Get the list of all books without content
+GET /api/v1/books HTTP/2.0
+
+3. Get a specific book by its id
+GET /api/v1/books/{id} HTTP/2.0

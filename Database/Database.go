@@ -1,46 +1,36 @@
+// Package Database implements a basic database module for the Book-server.
+// It provides a global 'db' object of type DataBase
+// which is the central data storage for the Book-server.
+// The db object can be created from backup files using NewDB function,
+// and the pointer instance of the db object can be got by GetDB function.
 package Database
 
 import "BookServer/Models"
 
 // DataBase Stores the User and Book information
+// As map values are inconsistent in the memory,
+// Pointers of each entity with corresponding key is stored in a map
 type DataBase struct {
-	users map[string]Models.User
-	books map[int]Models.Book
+	Users map[string]*Models.User
+	Books map[int]*Models.Book
 }
 
-// NewDB() method creates a new DataBase instance
-//func (db *DataBase) NewDB() *DataBase {
-//
-//}
-
-// getUsers() method returns all the users
-func (db *DataBase) getUsers() []Models.User {
-	var allUsers []Models.User
-	for _, user := range db.users {
-		allUsers = append(allUsers, user)
+// NewDB function creates a new DataBase instance with the backup data,
+// Assigns into db instance and returns its address
+func NewDB() *DataBase {
+	db = DataBase{
+		Users: make(map[string]*Models.User),
+		Books: make(map[int]*Models.Book),
 	}
-	return allUsers
+	return &db
 }
 
-// getUserByUserName() returns the user specified by param{username}
-func (db *DataBase) getUserByUserName(username string) Models.User {
-	var user Models.User
-	user = db.users[username]
-	return user
+// GetDB returns the address of db instance
+// which is the Global DataBase object
+// or DataBase storage.
+func GetDB() *DataBase {
+	return &db
 }
 
-// getBooks() method returns all the books
-func (db *DataBase) getBooks() []Models.Book {
-	var allBooks []Models.Book
-	for _, book := range db.books {
-		allBooks = append(allBooks, book)
-	}
-	return allBooks
-}
-
-// getBookByBookId() returns the book specified by param{bookId}
-func (db *DataBase) getBookByBookId(bookId int) Models.Book {
-	var book Models.Book
-	book = db.books[bookId]
-	return book
-}
+// db is the Central/Global DataBase instance
+var db DataBase
