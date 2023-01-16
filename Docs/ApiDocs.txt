@@ -4,7 +4,7 @@ Example-Payload:
     {
         "book-name": "Kire bhai ki obosta?",
         "price": 200,
-        "isbn" : "4323-6456-4756-4564"
+        "isbn" : "4323-6456-4756-4564",
         "authors" : [
             {
                 "username": "imtiaz"

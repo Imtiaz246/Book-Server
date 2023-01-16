@@ -15,17 +15,17 @@ func Router() http.Handler {
 	r.Use(middleware.Logger)
 
 	// Book APIS
-	r.Route("/api/v1/books", bookRoutes)
+	r.Route("/api/v1/books", BookRoutes)
 	// User APIS
-	r.Route("/api/v1/users", userRoutes)
+	r.Route("/api/v1/users", UserRoutes)
 
 	return r
 }
 
-func bookRoutes(r chi.Router) {
+func BookRoutes(r chi.Router) {
 	// Protected Routes, Authentication required
 	r.Group(func(r chi.Router) {
-		// Todo: apply jwt authentication
+		// TODO: apply jwt authentication
 		r.Post("/", Controllers.CreateBook)
 		r.Delete("/{id}", Controllers.DeleteBook)
 	})
@@ -34,14 +34,15 @@ func bookRoutes(r chi.Router) {
 	r.Get("/{id}", Controllers.GetBook)
 }
 
-func userRoutes(r chi.Router) {
+func UserRoutes(r chi.Router) {
 	// Protected Routes, Authentication required
 	r.Group(func(r chi.Router) {
-		// Todo: apply jwt authentication
+		// TODO: apply jwt authentication
 		r.Post("/", Controllers.CreateUser)
-		r.Delete("/{id}", Controllers.DeleteUser)
+		r.Delete("/{username}", Controllers.DeleteUser)
 	})
 	// Public Routes
 	r.Get("/", Controllers.GetUserList)
-	r.Get("/{id}", Controllers.GetUser)
+	r.Get("/{username}", Controllers.GetUser)
+	r.Get("/{username}/books", Controllers.GetBooksOfUser)
 }

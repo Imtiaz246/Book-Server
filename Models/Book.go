@@ -12,14 +12,14 @@ type Book struct {
 	Isbn        string      `json:"isbn"`
 	BookName    string      `json:"book-name"`
 	Authors     []*User     `json:"authors"`
-	UpdatedAt   time.Time   `json:"updated-at"`
-	PublishDate time.Time   `json:"publish-date"`
-	BookContent bookContent `json:"book-content"`
+	UpdatedAt   time.Time   `json:"updated-at,omitempty"`
+	PublishDate time.Time   `json:"publish-date,omitempty"`
+	BookContent BookContent `json:"book-content,omitempty"`
 }
 
-type bookContent struct {
-	OverView string    `json:"over-view"`
-	Chapters []chapter `json:"chapters"`
+type BookContent struct {
+	OverView string    `json:"over-view,omitempty"`
+	Chapters []chapter `json:"chapters,omitempty"`
 }
 
 type chapter struct {
@@ -27,17 +27,22 @@ type chapter struct {
 	ChapterContent string `json:"chapter-content"`
 }
 
-// NewBook function creates a new book instance, from the json []byte slice.
+// NewBook creates a new book instance, from the json []byte slice.
 // Returns the address of the book instance
-func NewBook(jsonObj []byte) (*Book, error) {
+func NewBook(body []byte) (*Book, error) {
 	var newBook Book
-	err := json.Unmarshal(jsonObj, &newBook)
-	if err != nil {
-		return &newBook, err
-	}
-	// TODO: generate id and other things that has to be auto generated
-
+	err := json.Unmarshal(body, &newBook)
 	return &newBook, err
+}
+
+// CheckValidity checks if book information is valid or not. If not valid,
+// it returns False, otherwise returns True.
+func (b *Book) CheckValidity() bool {
+	nl, al, cl := len(b.BookName), len(b.Authors), len(b.BookContent.Chapters)
+	if nl == 0 || al == 0 || cl == 0 {
+		return false
+	}
+	return true
 }
 
 // GenerateJSON creates JSON object from Book object.

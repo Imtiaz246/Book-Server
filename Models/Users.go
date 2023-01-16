@@ -8,20 +8,32 @@ import (
 type User struct {
 	Id           int       `json:"id"`
 	Role         string    `json:"role"`
+	Name         string    `json:"name"`
+	Email        string    `json:"email"`
 	Username     string    `json:"username"`
-	Password     string    `json:"password"`
+	Password     string    `json:"password,omitempty"`
 	Organization string    `json:"organization"`
-	BookOwns     []*Book   `json:"book-owns"`
-	CreatedAt    time.Time `json:"created-at"`
-	UpdatedAt    time.Time `json:"updated-at"`
+	BookOwns     []*Book   `json:"book-owns,omitempty"`
+	CreatedAt    time.Time `json:"created-at,omitempty"`
+	UpdatedAt    time.Time `json:"updated-at,omitempty"`
 }
 
 // NewUser creates a user instance, from the json []byte slice.
 // Returns the pointer of the user instance
-func NewUser(jsonObj []byte) (*User, error) {
+func NewUser(body []byte) (*User, error) {
 	var newUser User
-	err := json.Unmarshal(jsonObj, &newUser)
+	err := json.Unmarshal(body, &newUser)
 	return &newUser, err
+}
+
+// CheckValidity checks if user information is valid or not. If not valid,
+// it returns False, otherwise returns True.
+func (u *User) CheckValidity() bool {
+	nl, pl := len(u.Username), len(u.Password)
+	if nl == 0 || pl == 0 {
+		return false
+	}
+	return true
 }
 
 // GenerateJSON generates JSON object from Go object

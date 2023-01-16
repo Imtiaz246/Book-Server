@@ -5,22 +5,30 @@
 // and the pointer instance of the db object can be got by GetDB function.
 package Database
 
-import "BookServer/Models"
+import "sync"
 
 // DataBase Stores the User and Book information
 // As map values are inconsistent in the memory,
 // Pointers of each entity with corresponding key is stored in a map
 type DataBase struct {
-	Users map[string]*Models.User
-	Books map[int]*Models.Book
+	Users                  UserType
+	Books                  BookType
+	nextUserId, nextBookId int
+	// mu is used for synchronizing operations on the types.
+	// As maps in golang are not concurrency proof,
+	// So before doing [insert key, update key, get next id] operations,
+	// we've to synchronize the operations.
+	mu sync.Mutex
 }
 
 // NewDB function creates a new DataBase instance with the backup data,
 // Assigns into db instance and returns its address
 func NewDB() *DataBase {
 	db = DataBase{
-		Users: make(map[string]*Models.User),
-		Books: make(map[int]*Models.Book),
+		Users:      NewUserType(),
+		Books:      NewBookType(),
+		nextUserId: 1001,
+		nextBookId: 1001,
 	}
 	return &db
 }
@@ -34,3 +42,23 @@ func GetDB() *DataBase {
 
 // db is the Central/Global DataBase instance
 var db DataBase
+
+// GetNextUserId returns the next user id available to use
+func (d *DataBase) GetNextUserId() int {
+	return d.nextUserId
+}
+
+// GetNextBookId returns the next book id available to use
+func (d *DataBase) GetNextBookId() int {
+	return d.nextBookId
+}
+
+// Lock locks the database for synchronizing the operations
+func (d *DataBase) Lock() {
+	d.mu.Lock()
+}
+
+// UnLock unlocks the database for further operations
+func (d *DataBase) UnLock() {
+	d.mu.Unlock()
+}

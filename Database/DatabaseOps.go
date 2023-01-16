@@ -1,46 +1,56 @@
 package Database
 
-import "BookServer/Models"
+// CreateUser creates a user and returns its json instance
+func (d *DataBase) CreateUser(body []byte) ([]byte, error) {
+	newUser, err := d.Users.Insert(body)
+	return newUser, err
+}
 
 // GetUsers method returns all the users
-func (db *DataBase) GetUsers() []Models.User {
-	var allUsers []Models.User
-	for _, user := range db.Users {
-		allUsers = append(allUsers, *user)
-	}
-	return allUsers
+func (d *DataBase) GetUsers() ([]byte, error) {
+	allUsers, err := d.Users.Gets()
+	return allUsers, err
 }
 
 // GetUserByUserName returns the user specified by param{username}
-func (db *DataBase) GetUserByUserName(username string) Models.User {
-	var user Models.User
-	user = *db.Users[username]
-	return user
+func (d *DataBase) GetUserByUserName(username string) ([]byte, error) {
+	user, err := d.Users.Get(username)
+	return user, err
 }
 
 // DeleteUserByUserName deletes a user record from the database.
 // Returns True if operation is successful,
 // returns False otherwise
-func (db *DataBase) DeleteUserByUserName(username string) (bool, string) {
-	if db.Users[username] == nil {
-		return false, "Record doesn't exists in the database!!!"
+func (d *DataBase) DeleteUserByUserName(username string) error {
+	_, err := d.Users.Get(username)
+	if err != nil {
+		return err
 	}
-	db.Users[username] = nil
-	return true, "Record deleted successfully!!!"
+	delete(d.Users, username)
+	return nil
+}
+
+// CreateBook creates a book and returns its json object
+func (d *DataBase) CreateBook(body []byte) ([]byte, error) {
+	newBook, err := d.Books.Insert(body)
+	return newBook, err
 }
 
 // GetBooks method returns all the books.
-func (db *DataBase) GetBooks() []Models.Book {
-	var allBooks []Models.Book
-	for _, book := range db.Books {
-		allBooks = append(allBooks, *book)
-	}
-	return allBooks
+func (d *DataBase) GetBooks() ([]byte, error) {
+	allBooks, err := d.Books.Gets()
+	return allBooks, err
 }
 
 // GetBookByBookId returns book information specified by param{bookId}
-func (db *DataBase) GetBookByBookId(bookId int) Models.Book {
-	var book Models.Book
-	book = *db.Books[bookId]
-	return book
+func (d *DataBase) GetBookByBookId(bookId int) ([]byte, error) {
+	book, err := d.Books.Get(bookId)
+	return book, err
+}
+
+// DeleteBookByBookId returns book information specified by param{bookId}
+func (d *DataBase) DeleteBookByBookId(bookId int) ([]byte, error) {
+	// todo:
+	book, err := d.Books.Get(bookId)
+	return book, err
 }
