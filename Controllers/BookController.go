@@ -9,7 +9,7 @@ import (
 )
 
 // GetBookList returns all the book list
-func GetBookList(w http.ResponseWriter, r *http.Request) {
+func GetBookList(w http.ResponseWriter, _ *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
@@ -39,8 +39,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	w.Write(book)
 }
 
-// CreateBook creates a book
-// Returns the created book
+// CreateBook creates a book. Returns the created book
 func CreateBook(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
@@ -58,6 +57,20 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 
 // DeleteBook deletes a book specified by the param{bookId}
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
-	// todo: .....
-	w.Write([]byte(r.URL.Path))
+	db := Database.GetDB()
+	db.Lock()
+	defer db.UnLock()
+
+	bookId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err == nil {
+		err = db.DeleteBookByBookId(bookId)
+	}
+	if err != nil {
+		w.WriteHeader(204)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Header().Add("content-type", "application/json")
+	w.WriteHeader(202)
+	w.Write([]byte("deleted successfully"))
 }

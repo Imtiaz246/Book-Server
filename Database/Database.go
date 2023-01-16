@@ -5,7 +5,9 @@
 // and the pointer instance of the db object can be got by GetDB function.
 package Database
 
-import "sync"
+import (
+	"sync"
+)
 
 // DataBase Stores the User and Book information
 // As map values are inconsistent in the memory,
@@ -30,6 +32,8 @@ func NewDB() *DataBase {
 		nextUserId: 1001,
 		nextBookId: 1001,
 	}
+	//uJsonData, bJsonData := Utils.RestoreDataFromBackupFiles()
+	//
 	return &db
 }
 

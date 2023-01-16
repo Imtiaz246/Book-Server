@@ -23,7 +23,7 @@ func NewBookType() BookType {
 }
 
 // Insert tries to add a user to the database. If a username already exists,
-// it returns a (nil, error) tuple otherwise returns the (*user, nil) tuple
+// it returns a (nil, error) tuple otherwise returns the (json user object, nil) tuple
 func (u *UserType) Insert(body []byte) ([]byte, error) {
 	user, err := Models.NewUser(body)
 	if err != nil || !user.CheckValidity() {
@@ -46,7 +46,8 @@ func (u *UserType) Insert(body []byte) ([]byte, error) {
 	return uJson, err
 }
 
-// Gets returns all the user from the database in a json format
+// Gets returns all the user from the database in the json format.
+// In addition, sends error if any occurs.
 func (u *UserType) Gets() ([]byte, error) {
 	var users []*Models.User
 	for _, user := range *u {
@@ -58,7 +59,7 @@ func (u *UserType) Gets() ([]byte, error) {
 }
 
 // Get returns a specific user defined by the param{username}.
-// If a record is found, it returns the (*user, nil) tuple,
+// If a record is found, it returns the (json user object, nil) tuple,
 // otherwise returns (nil, err) tuple.
 func (u *UserType) Get(username string) ([]byte, error) {
 	user, found := (*u)[username]
@@ -70,8 +71,10 @@ func (u *UserType) Get(username string) ([]byte, error) {
 	return uJson, err
 }
 
-// Insert inserts a book record into the database. It also checks for information validity.
-// If the information is not valid it returns (nil, err) tuple, otherwise returns (book, nil) tuple.
+// Insert inserts a book record into the database.
+// In addition, it also checks for information validity.
+// If the information is not valid it returns (nil, err) tuple,
+// otherwise returns (json book object, nil) tuple.
 func (b *BookType) Insert(body []byte) ([]byte, error) {
 	book, err := Models.NewBook(body)
 	if err != nil || !book.CheckValidity() {
@@ -102,7 +105,7 @@ func (b *BookType) Gets() ([]byte, error) {
 }
 
 // Get returns a specific book defined by the param{bookId}.
-// If a record is found, it returns the ([]byte(book), nil) tuple,
+// If a record is found, it returns the (json book object, nil) tuple,
 // otherwise returns (nil, error) tuple.
 func (b *BookType) Get(bookId int) ([]byte, error) {
 	book, found := (*b)[bookId]

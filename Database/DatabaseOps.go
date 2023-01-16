@@ -19,8 +19,7 @@ func (d *DataBase) GetUserByUserName(username string) ([]byte, error) {
 }
 
 // DeleteUserByUserName deletes a user record from the database.
-// Returns True if operation is successful,
-// returns False otherwise
+// Returns error if any error occurs otherwise return nil
 func (d *DataBase) DeleteUserByUserName(username string) error {
 	_, err := d.Users.Get(username)
 	if err != nil {
@@ -49,8 +48,11 @@ func (d *DataBase) GetBookByBookId(bookId int) ([]byte, error) {
 }
 
 // DeleteBookByBookId returns book information specified by param{bookId}
-func (d *DataBase) DeleteBookByBookId(bookId int) ([]byte, error) {
-	// todo:
-	book, err := d.Books.Get(bookId)
-	return book, err
+func (d *DataBase) DeleteBookByBookId(bookId int) error {
+	_, err := d.Books.Get(bookId)
+	if err != nil {
+		return err
+	}
+	delete(d.Books, bookId)
+	return nil
 }

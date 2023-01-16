@@ -18,8 +18,8 @@ type User struct {
 	UpdatedAt    time.Time `json:"updated-at,omitempty"`
 }
 
-// NewUser creates a user instance, from the json []byte slice.
-// Returns the pointer of the user instance
+// NewUser creates a user instance, from the http request body.
+// Returns the pointer of the new user instance
 func NewUser(body []byte) (*User, error) {
 	var newUser User
 	err := json.Unmarshal(body, &newUser)
@@ -37,7 +37,7 @@ func (u *User) CheckValidity() bool {
 }
 
 // GenerateJSON generates JSON object from Go object
-// Returns the json object, error tuple
+// Returns the (json object, error) tuple
 func (u *User) GenerateJSON() ([]byte, error) {
 	jsonObj, err := json.Marshal(u)
 	return jsonObj, err
