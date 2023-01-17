@@ -2,6 +2,7 @@ package Controllers
 
 import (
 	"BookServer/Database"
+	"BookServer/Utils"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
@@ -12,13 +13,13 @@ func GetUserList(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
+	w.Header().Add("content-type", "application/json")
 
 	userList, err := db.GetUsers()
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		w.Write(userList)
 		return
 	}
-	w.Header().Add("content-type", "application/json")
 	w.Write(userList)
 }
 
@@ -27,13 +28,13 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
+	w.Header().Add("content-type", "application/json")
 
 	user, err := db.GetUserByUserName(chi.URLParam(r, "username"))
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		w.Write(user)
 		return
 	}
-	w.Header().Add("content-type", "application/json")
 	w.Write(user)
 }
 
@@ -43,20 +44,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
+	w.Header().Add("content-type", "application/json")
 
 	body, err := io.ReadAll(r.Body)
 	user, err := db.CreateUser(body)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		w.Write(Utils.CreateErrorJson(err))
 		return
 	}
-	w.Header().Add("content-type", "application/json")
 	w.Write(user)
-}
-
-// GetBooksOfUser returns the books list of a specific user defined by param{username}
-func GetBooksOfUser(w http.ResponseWriter, r *http.Request) {
-	// todo: ...
 }
 
 // DeleteUser deletes a User specified by the param{UserId}
@@ -64,14 +60,15 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
+	w.Header().Add("content-type", "application/json")
 
 	err := db.DeleteUserByUserName(chi.URLParam(r, "username"))
+	msg, err := Utils.CreateSuccessJson([]byte("deleted successfully"))
 	if err != nil {
 		w.WriteHeader(204)
-		w.Write([]byte(err.Error()))
+		w.Write(Utils.CreateErrorJson(err))
 		return
 	}
-	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(202)
-	w.Write([]byte("deleted successfully"))
+	w.Write(msg)
 }

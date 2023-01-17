@@ -12,6 +12,13 @@ func (d *DataBase) GetUsers() ([]byte, error) {
 	return allUsers, err
 }
 
+// Authenticate checks if a user credentials are valid or not.
+// If not valid, it returns an error instance.
+func (d *DataBase) Authenticate(u, p string) error {
+	err := d.Users.CheckCredentials(u, p)
+	return err
+}
+
 // GetUserByUserName returns the user specified by param{username}
 func (d *DataBase) GetUserByUserName(username string) ([]byte, error) {
 	user, err := d.Users.Get(username)

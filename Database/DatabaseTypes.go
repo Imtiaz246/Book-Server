@@ -2,12 +2,15 @@ package Database
 
 import (
 	"BookServer/Models"
-	"encoding/json"
+	"BookServer/Utils"
 	"errors"
 	"time"
 )
 
+// UserType is a custom type which maps kay(username), value(*Model.User)
 type UserType map[string]*Models.User
+
+// BookType is a custom type which maps key(bookId), value(*Model.Book)
 type BookType map[int]*Models.Book
 
 // NewUserType creates a new UserType and returns the instance
@@ -39,10 +42,11 @@ func (u *UserType) Insert(body []byte) ([]byte, error) {
 	}
 	user.Id = db.nextUserId
 	db.nextUserId++
-	user.CreatedAt, user.UpdatedAt = time.Now(), time.Now()
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = user.CreatedAt
 
 	(*u)[username] = user
-	uJson, err := json.Marshal(user)
+	uJson, err := Utils.CreateSuccessJson(user)
 	return uJson, err
 }
 
@@ -54,7 +58,7 @@ func (u *UserType) Gets() ([]byte, error) {
 		user.Password = ""
 		users = append(users, user)
 	}
-	uJson, err := json.Marshal(users)
+	uJson, err := Utils.CreateSuccessJson(users)
 	return uJson, err
 }
 
@@ -67,8 +71,23 @@ func (u *UserType) Get(username string) ([]byte, error) {
 		err := errors.New("username doesn't exists")
 		return nil, err
 	}
-	uJson, err := json.Marshal(user)
+	uJson, err := Utils.CreateSuccessJson(user)
 	return uJson, err
+}
+
+// CheckCredentials checks if a user credentials are exists in the database of not.
+// If not valid or doesn't exist it returns an error.
+func (u *UserType) CheckCredentials(username, password string) error {
+	user, found := (*u)[username]
+	if !found {
+		err := errors.New("username doesn't exists")
+		return err
+	}
+	if user.Password != password {
+		err := errors.New("password doesn't match")
+		return err
+	}
+	return nil
 }
 
 // Insert inserts a book record into the database.
@@ -83,13 +102,13 @@ func (b *BookType) Insert(body []byte) ([]byte, error) {
 		}
 		return nil, err
 	}
-
 	book.Id = db.nextBookId
 	db.nextBookId++
-	book.PublishDate, book.UpdatedAt = time.Now(), time.Now()
+	book.PublishDate = time.Now()
+	book.UpdatedAt = book.PublishDate
 
 	(*b)[book.Id] = book
-	bJson, err := json.Marshal(book)
+	bJson, err := Utils.CreateSuccessJson(book)
 	return bJson, err
 }
 
@@ -100,7 +119,7 @@ func (b *BookType) Gets() ([]byte, error) {
 		book.BookContent = Models.BookContent{}
 		books = append(books, book)
 	}
-	bJson, err := json.Marshal(books)
+	bJson, err := Utils.CreateSuccessJson(books)
 	return bJson, err
 }
 
@@ -113,6 +132,6 @@ func (b *BookType) Get(bookId int) ([]byte, error) {
 		err := errors.New("book doesn't exists")
 		return nil, err
 	}
-	bJson, err := json.Marshal(book)
+	bJson, err := Utils.CreateSuccessJson(book)
 	return bJson, err
 }

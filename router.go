@@ -2,6 +2,7 @@ package main
 
 import (
 	"BookServer/Controllers"
+	"BookServer/Middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
@@ -25,7 +26,9 @@ func Router() http.Handler {
 func BookRoutes(r chi.Router) {
 	// Protected Routes, Authentication required
 	r.Group(func(r chi.Router) {
-		// TODO: apply jwt authentication
+		// Custom Basic Auth middleware
+		r.Use(Middleware.BasicAuth)
+
 		r.Post("/", Controllers.CreateBook)
 		r.Delete("/{id}", Controllers.DeleteBook)
 	})
@@ -37,12 +40,13 @@ func BookRoutes(r chi.Router) {
 func UserRoutes(r chi.Router) {
 	// Protected Routes, Authentication required
 	r.Group(func(r chi.Router) {
-		// TODO: apply jwt authentication
-		r.Post("/", Controllers.CreateUser)
+		// Custom Basic Auth middleware
+		r.Use(Middleware.BasicAuth)
+
 		r.Delete("/{username}", Controllers.DeleteUser)
 	})
 	// Public Routes
+	r.Post("/", Controllers.CreateUser)
 	r.Get("/", Controllers.GetUserList)
 	r.Get("/{username}", Controllers.GetUser)
-	r.Get("/{username}/books", Controllers.GetBooksOfUser)
 }

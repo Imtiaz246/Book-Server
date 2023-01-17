@@ -9,9 +9,12 @@ import (
 	"sync"
 )
 
-// DataBase Stores the User and Book information
-// As map values are inconsistent in the memory,
-// Pointers of each entity with corresponding key is stored in a map
+// DataBase Stores the User and Book information.
+// As map values are inconsistent in the memory, pointers
+// of each entity with corresponding key is stored in a map.
+// Using pointer of UserType & BookType entity with respect to
+// map kay is safe because server will run concurrently and multiple
+// copy of DataBase object will lead to some dirty data.
 type DataBase struct {
 	Users                  UserType
 	Books                  BookType
@@ -32,6 +35,7 @@ func NewDB() *DataBase {
 		nextUserId: 1001,
 		nextBookId: 1001,
 	}
+	// todo: add recovery
 	//uJsonData, bJsonData := Utils.RestoreDataFromBackupFiles()
 	//
 	return &db
