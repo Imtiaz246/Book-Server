@@ -55,8 +55,9 @@ func (u *UserType) Insert(body []byte) ([]byte, error) {
 func (u *UserType) Gets() ([]byte, error) {
 	var users []*Models.User
 	for _, user := range *u {
-		user.Password = ""
-		users = append(users, user)
+		cUser := user
+		cUser.Password = ""
+		users = append(users, cUser)
 	}
 	uJson, err := Utils.CreateSuccessJson(users)
 	return uJson, err
