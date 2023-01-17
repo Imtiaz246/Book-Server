@@ -3,17 +3,18 @@ package Controllers
 import (
 	"BookServer/Database"
 	"BookServer/Utils"
+	"encoding/json"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
 )
 
 // GetUserList returns all the User list in a json format
-func GetUserList(w http.ResponseWriter, r *http.Request) {
+func GetUserList(w http.ResponseWriter, _ *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
-	w.Header().Add("content-type", "application/json")
 
 	userList, err := db.GetUsers()
 	if err != nil {
@@ -28,7 +29,6 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
-	w.Header().Add("content-type", "application/json")
 
 	user, err := db.GetUserByUserName(chi.URLParam(r, "username"))
 	if err != nil {
@@ -38,13 +38,11 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.Write(user)
 }
 
-// CreateUser creates a User
-// Returns the created User
+// CreateUser creates a User. Returns the created User
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
-	w.Header().Add("content-type", "application/json")
 
 	body, err := io.ReadAll(r.Body)
 	user, err := db.CreateUser(body)
@@ -60,7 +58,6 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
-	w.Header().Add("content-type", "application/json")
 
 	err := db.DeleteUserByUserName(chi.URLParam(r, "username"))
 	msg, err := Utils.CreateSuccessJson([]byte("deleted successfully"))
@@ -70,5 +67,42 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(202)
+	w.Write(msg)
+}
+
+// GetToken generates a jwt token for a user.
+// First it tries to authenticate the user credentials.
+// If the credentials is valid then it generates a jwt token and returns it.
+func GetToken(w http.ResponseWriter, r *http.Request) {
+	db := Database.GetDB()
+	db.Lock()
+	defer db.UnLock()
+
+	var uc struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	body, _ := io.ReadAll(r.Body)
+	err := json.Unmarshal(body, &uc)
+	if err != nil {
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+
+	// Check if the user credentials is valid or not
+	err = db.Authenticate(uc.Username, uc.Password)
+	if err != nil {
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+
+	// Generate token and respond it
+	tokenStr, err := Utils.GenerateJwtToken(uc.Username)
+	fmt.Println("token ", tokenStr)
+	msg, err := Utils.CreateSuccessJson(tokenStr)
+	if err != nil {
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
 	w.Write(msg)
 }

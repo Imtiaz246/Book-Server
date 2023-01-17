@@ -15,6 +15,9 @@ func Router() http.Handler {
 	// Middleware lists
 	r.Use(middleware.Logger)
 
+	// Add common Header for all routes
+	r.Use(Middleware.AddHeaders)
+
 	// Book APIS
 	r.Route("/api/v1/books", BookRoutes)
 	// User APIS
@@ -49,4 +52,5 @@ func UserRoutes(r chi.Router) {
 	r.Post("/", Controllers.CreateUser)
 	r.Get("/", Controllers.GetUserList)
 	r.Get("/{username}", Controllers.GetUser)
+	r.Post("/get-token", Controllers.GetToken)
 }

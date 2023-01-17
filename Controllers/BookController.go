@@ -14,7 +14,6 @@ func GetBookList(w http.ResponseWriter, _ *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
-	w.Header().Add("content-type", "application/json")
 
 	bookList, err := db.GetBooks()
 	if err != nil {
@@ -29,7 +28,6 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
-	w.Header().Add("content-type", "application/json")
 
 	bookId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	book, err := db.GetBookByBookId(bookId)
@@ -45,7 +43,6 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
-	w.Header().Add("content-type", "application/json")
 
 	body, err := io.ReadAll(r.Body)
 	nBook, err := db.CreateBook(body)
@@ -66,7 +63,6 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		err = db.DeleteBookByBookId(bookId)
 	}
-	w.Header().Add("content-type", "application/json")
 
 	msg, err := Utils.CreateSuccessJson([]byte("deleted successfully"))
 	if err != nil {

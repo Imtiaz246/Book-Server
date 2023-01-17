@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func BasicAuth(next http.Handler) http.Handler {
+func JwtAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ai := r.Header.Get("Authorization")
 		if ai == "" {
@@ -18,7 +18,7 @@ func BasicAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		eAuthToken := r.Header.Get("Authorization")[6:]
+		eAuthToken := r.Header.Get("Authorization")[7:]
 		uAuthInfo, err := base64.StdEncoding.DecodeString(eAuthToken)
 		if err != nil {
 			w.Write([]byte(err.Error()))
