@@ -6,7 +6,6 @@
 package Database
 
 import (
-	"BookServer/Models"
 	"BookServer/Utils"
 	"context"
 	"encoding/json"
@@ -29,13 +28,13 @@ type DataBase struct {
 	Users                  UserType
 	Books                  BookType
 	nextUserId, nextBookId int
-	// mu is used for synchronizing operations on the types.
-	// As maps in golang are not concurrency proof,
+	// mu is used for synchronizing operations on the types
+	// because maps in golang are not concurrency proof.
 	// So before doing [insert key, update key, get next id] operations,
 	// we've to synchronize the operations.
 	mu sync.Mutex
-	// jobDelay is used for running a DataBase task after every certain amount of time.
-	// Here jobDelay is used to back up DataBase data in backup folder after every jobDelay second.
+	// jobDelay is used for running a task scheduler in every certain amount of time
+	// to store the DataBase data in the back-up folder
 	jobDelay time.Duration
 }
 
@@ -53,27 +52,22 @@ func NewDB() *DataBase {
 	}
 	// Restoring data
 	uJsonData, bJsonData := Utils.RestoreDataFromBackupFiles()
-	var us []*Models.User
-	var bs []*Models.Book
 
-	err := json.Unmarshal(uJsonData, &us)
-	err = json.Unmarshal(bJsonData, &bs)
+	err := json.Unmarshal(uJsonData, &db.Users)
+	err = json.Unmarshal(bJsonData, &db.Books)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("kire", err.Error())
 		os.Exit(1)
 	}
-	// Assign restored data to db and update nextUserId, nextBookId
-	for _, u := range us {
+	// Update nextUserId, nextBookId of DataBase state
+	for _, u := range db.Users {
 		db.nextUserId = int(math.Max(float64(u.Id), float64(db.nextUserId)+1))
-		db.Users[u.Username] = u
 	}
-	for _, b := range bs {
+	for _, b := range db.Books {
 		db.nextBookId = int(math.Max(float64(b.Id), float64(db.nextBookId)+1))
-		db.Books[b.Id] = b
 	}
-	// Activate the Backup Scheduler
-	// It will back up DataBase data after every
-	// certain amount of time.
+	// Activate the Backup Scheduler.
+	// It will back up DataBase data after every certain amount of time.
 	db.DbBackupScheduler()
 
 	return &db
@@ -114,43 +108,28 @@ func (d *DataBase) UnLock() {
 func (d *DataBase) DbBackupScheduler() {
 	taskScheduler := chrono.NewDefaultTaskScheduler()
 	_, err := taskScheduler.ScheduleWithFixedDelay(func(ctx context.Context) {
-		// Decompose database data
-		us, bs := d.decomposeDatabaseData()
+		db.Lock()
+		defer db.UnLock()
 
-		usersJson, err := json.Marshal(us)
-		booksJson, err := json.Marshal(bs)
+		// Create json objects of DataBase types
+		usersJson, err := json.Marshal(d.Users)
+		booksJson, err := json.Marshal(d.Books)
 		if err != nil {
 			log.Print(err.Error())
 			return
 		}
+		// Store into the backup files
 		err = Utils.StoreDataToBackupFiles(usersJson, booksJson)
 		if err != nil {
 			log.Print(err.Error())
 			return
 		}
 		log.Print("Scheduled Backup Successful")
-	}, db.jobDelay)
+	}, db.jobDelay /* db.jobDelay is the timer for scheduled job */)
 
 	if err != nil {
 		log.Print("Task scheduler didn't successfully started")
 		os.Exit(1)
 	}
 	log.Print("Task has been scheduled successfully.")
-}
-
-// decomposeDatabaseData creates []Models.User and []Models.Book and returns
-func (d *DataBase) decomposeDatabaseData() ([]Models.User, []Models.Book) {
-	// Decompose database data
-	var us []Models.User
-	var bs []Models.Book
-	d.Lock()
-	for _, u := range d.Users {
-		us = append(us, *u)
-	}
-	for _, b := range d.Books {
-		bs = append(bs, *b)
-	}
-	d.UnLock()
-
-	return us, bs
 }

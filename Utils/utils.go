@@ -27,10 +27,10 @@ func RestoreDataFromBackupFiles() ([]byte, []byte) {
 		os.Exit(1)
 	}
 	if len(usersJsonData) == 0 {
-		usersJsonData = []byte("[]")
+		usersJsonData = []byte("{}")
 	}
 	if len(booksJsonData) == 0 {
-		booksJsonData = []byte("[]")
+		booksJsonData = []byte("{}")
 	}
 	return usersJsonData, booksJsonData
 }
@@ -38,17 +38,12 @@ func RestoreDataFromBackupFiles() ([]byte, []byte) {
 // StoreDataToBackupFiles gets data from the central database
 // and store those data to the backup files.
 func StoreDataToBackupFiles(userJsonData, booksJsonData []byte) error {
-	uf, err := os.Open("./BackupFiles/Users.json")
-	defer uf.Close()
-	// Store usersJsonData to the backup file
-	_, err = uf.Write(userJsonData)
+	var err error
+	err = os.WriteFile("./BackupFiles/Users.json", userJsonData, 0644)
 	if err != nil {
 		return err
 	}
-	bf, err := os.Open("./BackupFiles/Books.json")
-	defer bf.Close()
-	// Store booksJsonData to the backup file
-	_, err = bf.Write(booksJsonData)
+	err = os.WriteFile("./BackupFiles/Books.json", userJsonData, 0644)
 	return err
 }
 
@@ -91,7 +86,7 @@ func GenerateJwtToken(username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(10 * time.Minute)
+	claims["exp"] = time.Now().Add(10 * time.Hour)
 	claims["authorized"] = true
 	claims["user"] = username
 

@@ -4,7 +4,6 @@ import (
 	"BookServer/Database"
 	"BookServer/Utils"
 	"encoding/json"
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
@@ -77,7 +76,7 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
-
+	// User Credentials struct
 	var uc struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -98,7 +97,6 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 
 	// Generate token and respond it
 	tokenStr, err := Utils.GenerateJwtToken(uc.Username)
-	fmt.Println("token ", tokenStr)
 	msg, err := Utils.CreateSuccessJson(tokenStr)
 	if err != nil {
 		w.Write(Utils.CreateErrorJson(err))

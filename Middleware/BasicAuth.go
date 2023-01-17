@@ -17,7 +17,7 @@ func BasicAuth(next http.Handler) http.Handler {
 			w.Write(Utils.CreateErrorJson(errors.New("authentication required")))
 			return
 		}
-
+		// Get the token from the header.
 		eAuthToken := r.Header.Get("Authorization")[6:]
 		uAuthInfo, err := base64.StdEncoding.DecodeString(eAuthToken)
 		if err != nil {
