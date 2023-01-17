@@ -43,7 +43,7 @@ func StoreDataToBackupFiles(userJsonData, booksJsonData []byte) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile("./BackupFiles/Books.json", userJsonData, 0644)
+	err = os.WriteFile("./BackupFiles/Books.json", booksJsonData, 0644)
 	return err
 }
 

@@ -12,7 +12,7 @@ import (
 func JwtAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ai := r.Header.Get("Authorization")
-		if ai == "" {
+		if len(ai) == 0 {
 			w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
 			w.Write(Utils.CreateErrorJson(errors.New("authentication required")))
 			return
