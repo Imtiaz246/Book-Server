@@ -42,6 +42,7 @@ func (u *UserType) Insert(body []byte) ([]byte, error) {
 	}
 	user.Id = db.nextUserId
 	db.nextUserId++
+	user.Role = "user"
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = user.CreatedAt
 
@@ -55,9 +56,9 @@ func (u *UserType) Insert(body []byte) ([]byte, error) {
 func (u *UserType) Gets() ([]byte, error) {
 	var users []*Models.User
 	for _, user := range *u {
-		cUser := user
+		cUser := *user
 		cUser.Password = ""
-		users = append(users, cUser)
+		users = append(users, &cUser)
 	}
 	uJson, err := Utils.CreateSuccessJson(users)
 	return uJson, err
@@ -76,6 +77,40 @@ func (u *UserType) Get(username string) ([]byte, error) {
 	return uJson, err
 }
 
+// DeleteUser deletes a user from the DataBase
+func (u *UserType) DeleteUser(username string) error {
+	_, found := (*u)[username]
+	if !found {
+		return errors.New("username not found")
+	}
+	delete(*u, username)
+	return nil
+}
+
+// CreateAdmin creates an admin for the server.
+// Admin has permission to delete user and also books.
+// Admin is created with username "imtiaz" and password "1234"
+func (u *UserType) CreateAdmin() error {
+	_, found := (*u)["imtiaz"]
+	if found {
+		return nil
+	}
+	admin := Models.User{
+		Id:           100,
+		Username:     "imtiaz",
+		Password:     "1234",
+		Organization: "Apps-code Ltd",
+		Email:        "imtiazuddincho246@gmail.com",
+		Role:         "admin",
+	}
+	(*u)[admin.Username] = &admin
+	_, found = (*u)[admin.Username]
+	if !found {
+		return errors.New("can't create admin")
+	}
+	return nil
+}
+
 // CheckCredentials checks if a user credentials are exists in the database of not.
 // If not valid or doesn't exist it returns an error.
 func (u *UserType) CheckCredentials(username, password string) error {
@@ -91,8 +126,21 @@ func (u *UserType) CheckCredentials(username, password string) error {
 	return nil
 }
 
+// UsersExistence checks if a list of user is exists in DataBase or not.
+// if not exists returns an error.
+func (u *UserType) UsersExistence(users []*Models.User) error {
+	for _, usr := range users {
+		_, found := (*u)[usr.Username]
+		if !found {
+			return errors.New("username " + usr.Username + " doesn't exists")
+		}
+	}
+	return nil
+}
+
 // Insert inserts a book record into the database.
-// In addition, it also checks for information validity.
+// In addition, it also checks for information validity & authors validation &
+// update the BookOwns property of User field of DataBase.
 // If the information is not valid it returns (nil, err) tuple,
 // otherwise returns (json book object, nil) tuple.
 func (b *BookType) Insert(body []byte) ([]byte, error) {
@@ -103,6 +151,17 @@ func (b *BookType) Insert(body []byte) ([]byte, error) {
 		}
 		return nil, err
 	}
+	// checks authors existence in the DataBase
+	// if any username is not exists in the db it returns an error
+	err = db.AuthenticateUsersExistence(book.Authors)
+	if err != nil {
+		return nil, err
+	}
+	// Connect authors with the book created
+	for _, author := range book.Authors {
+		db.Users[author.Username].BookOwns = append(db.Users[author.Username].BookOwns, book)
+	}
+
 	book.Id = db.nextBookId
 	db.nextBookId++
 	book.PublishDate = time.Now()
@@ -135,4 +194,21 @@ func (b *BookType) Get(bookId int) ([]byte, error) {
 	}
 	bJson, err := Utils.CreateSuccessJson(book)
 	return bJson, err
+}
+
+// DeleteBook deletes a book from the DataBase
+func (b *BookType) DeleteBook(bookId int, requestedUser string) error {
+	book, found := (*b)[bookId]
+	if !found {
+		return errors.New("book doesn't exists")
+	}
+	for _, a := range book.Authors {
+		if a.Username == requestedUser {
+			goto DELETE
+		}
+	}
+	return errors.New("user don't have permission")
+DELETE:
+	delete(*b, bookId)
+	return nil
 }

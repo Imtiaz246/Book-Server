@@ -11,7 +11,7 @@ type Book struct {
 	SoldCopies  int         `json:"sold-copies"`
 	Isbn        string      `json:"isbn"`
 	BookName    string      `json:"book-name"`
-	Authors     []*User     `json:"authors"`
+	Authors     []*User     `json:"authors,omitempty"`
 	UpdatedAt   time.Time   `json:"updated-at,omitempty"`
 	PublishDate time.Time   `json:"publish-date,omitempty"`
 	BookContent BookContent `json:"book-content,omitempty"`

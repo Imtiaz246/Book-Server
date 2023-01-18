@@ -2,8 +2,10 @@ package Controllers
 
 import (
 	"BookServer/Database"
+	"BookServer/Models"
 	"BookServer/Utils"
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
@@ -58,14 +60,33 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	db.Lock()
 	defer db.UnLock()
 
-	err := db.DeleteUserByUserName(chi.URLParam(r, "username"))
-	msg, err := Utils.CreateSuccessJson([]byte("deleted successfully"))
+	dUser := chi.URLParam(r, "username")
+	// Checks if the request comes from admin otherwise returns bad request
+	rUser := r.Context().Value("username").(string)
+	if db.Users[rUser].Role != "admin" {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write(Utils.CreateErrorJson(errors.New("don't have permission to delete a user")))
+		return
+	}
+	// if rUser == dUser then it's admin
+	if rUser == dUser {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write(Utils.CreateErrorJson(errors.New("can't delete the admin")))
+		return
+	}
+	err := db.DeleteUserByUserName(dUser)
 	if err != nil {
-		w.WriteHeader(204)
+		w.WriteHeader(http.StatusNotAcceptable)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}
-	w.WriteHeader(202)
+	msg, err := Utils.CreateSuccessJson("deleted successfully")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
 	w.Write(msg)
 }
 
@@ -97,8 +118,32 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 
 	// Generate token and respond it
 	tokenStr, err := Utils.GenerateJwtToken(uc.Username)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
 	msg, err := Utils.CreateSuccessJson(tokenStr)
 	if err != nil {
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	w.Write(msg)
+}
+
+// GetBooksOfUser returns the book list of a user defined by param{username}
+func GetBooksOfUser(w http.ResponseWriter, r *http.Request) {
+	db := Database.GetDB()
+	db.Lock()
+	defer db.UnLock()
+
+	books := db.Users[chi.URLParam(r, "username")].BookOwns
+	for _, b := range books {
+		b.Authors = []*Models.User{}
+	}
+	msg, err := Utils.CreateSuccessJson(books)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}

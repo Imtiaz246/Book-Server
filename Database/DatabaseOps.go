@@ -1,5 +1,7 @@
 package Database
 
+import "BookServer/Models"
+
 // CreateUser creates a user and returns its json instance
 func (d *DataBase) CreateUser(body []byte) ([]byte, error) {
 	newUser, err := d.Users.Insert(body)
@@ -19,6 +21,12 @@ func (d *DataBase) Authenticate(u, p string) error {
 	return err
 }
 
+// AuthenticateUsersExistence checks if a list of user is exists in the DataBase or not.
+func (d *DataBase) AuthenticateUsersExistence(users []*Models.User) error {
+	err := d.Users.UsersExistence(users)
+	return err
+}
+
 // GetUserByUserName returns the user specified by param{username}
 func (d *DataBase) GetUserByUserName(username string) ([]byte, error) {
 	user, err := d.Users.Get(username)
@@ -28,12 +36,8 @@ func (d *DataBase) GetUserByUserName(username string) ([]byte, error) {
 // DeleteUserByUserName deletes a user record from the database.
 // Returns error if any error occurs otherwise return nil
 func (d *DataBase) DeleteUserByUserName(username string) error {
-	_, err := d.Users.Get(username)
-	if err != nil {
-		return err
-	}
-	delete(d.Users, username)
-	return nil
+	err := d.Users.DeleteUser(username)
+	return err
 }
 
 // CreateBook creates a book and returns its json object
@@ -55,11 +59,7 @@ func (d *DataBase) GetBookByBookId(bookId int) ([]byte, error) {
 }
 
 // DeleteBookByBookId returns book information specified by param{bookId}
-func (d *DataBase) DeleteBookByBookId(bookId int) error {
-	_, err := d.Books.Get(bookId)
-	if err != nil {
-		return err
-	}
-	delete(d.Books, bookId)
-	return nil
+func (d *DataBase) DeleteBookByBookId(bookId int, requestedUser string) error {
+	err := d.Books.DeleteBook(bookId, requestedUser)
+	return err
 }

@@ -58,18 +58,27 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	db := Database.GetDB()
 	db.Lock()
 	defer db.UnLock()
+	// checks if the request comes from admin or author
+	requestedUser := r.Context().Value("username").(string)
 
 	bookId, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err == nil {
-		err = db.DeleteBookByBookId(bookId)
-	}
-
-	msg, err := Utils.CreateSuccessJson([]byte("deleted successfully"))
 	if err != nil {
-		w.WriteHeader(204)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}
-	w.WriteHeader(202)
+	err = db.DeleteBookByBookId(bookId, requestedUser)
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	msg, err := Utils.CreateSuccessJson("deleted successfully")
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
 	w.Write(msg)
 }

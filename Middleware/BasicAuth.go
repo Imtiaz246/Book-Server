@@ -13,7 +13,7 @@ func BasicAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ai := r.Header.Get("Authorization")
 		if ai == "" {
-			w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(Utils.CreateErrorJson(errors.New("authentication required")))
 			return
 		}
@@ -21,7 +21,8 @@ func BasicAuth(next http.Handler) http.Handler {
 		eAuthToken := r.Header.Get("Authorization")[6:]
 		uAuthInfo, err := base64.StdEncoding.DecodeString(eAuthToken)
 		if err != nil {
-			w.Write([]byte(err.Error()))
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write(Utils.CreateErrorJson(err))
 			return
 		}
 		cx := bytes.Index(uAuthInfo, []byte(":"))

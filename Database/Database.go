@@ -9,7 +9,6 @@ import (
 	"BookServer/Utils"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/procyon-projects/chrono"
 	"log"
 	"math"
@@ -24,6 +23,7 @@ import (
 // Using pointer of UserType & BookType entity with respect to
 // map kay is safe because server will run concurrently and multiple
 // copy of DataBase object will lead to some dirty data.
+// Permitted operations on DataBase object are listed on DataBaseOps.go file.
 type DataBase struct {
 	Users                  UserType
 	Books                  BookType
@@ -56,15 +56,32 @@ func NewDB() *DataBase {
 	err := json.Unmarshal(uJsonData, &db.Users)
 	err = json.Unmarshal(bJsonData, &db.Books)
 	if err != nil {
-		fmt.Println("kire", err.Error())
+		log.Fatal(err.Error())
 		os.Exit(1)
 	}
-	// Update nextUserId, nextBookId of DataBase state
+	// Update nextUserId, nextBookId of DataBase state and
 	for _, u := range db.Users {
+		// update BooksOwns property because while doing backup and unmarshalling
+		// it will make a copy and assign its address which is not the actual address of books.
+		for _, b := range u.BookOwns {
+			b = db.Books[b.Id]
+		}
 		db.nextUserId = int(math.Max(float64(u.Id), float64(db.nextUserId)+1))
 	}
 	for _, b := range db.Books {
+		// connect with the actual address of the users with the books authors.
+		// which is not the actual address of the user.
+		// because while unmarshalling a copy of user object in author slice will be created.
+		for _, a := range b.Authors {
+			a = db.Users[a.Username]
+		}
 		db.nextBookId = int(math.Max(float64(b.Id), float64(db.nextBookId)+1))
+	}
+	// Create a demo admin
+	err = db.Users.CreateAdmin()
+	if err != nil {
+		log.Fatal(err.Error())
+		os.Exit(1)
 	}
 	// Activate the Backup Scheduler.
 	// It will back up DataBase data after every certain amount of time.

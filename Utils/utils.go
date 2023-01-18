@@ -2,6 +2,7 @@ package Utils
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"io"
@@ -82,17 +83,47 @@ func CreateSuccessJson(msg any) ([]byte, error) {
 // GenerateJwtToken creates a jwt token for a user with the
 // username and password. Returns the (token, error) tuple.
 func GenerateJwtToken(username string) (string, error) {
-	SecretKey := []byte("mysecret")
-	token := jwt.New(jwt.SigningMethodHS256)
+	// Get the secret key from the environment variable
+	jwtSecretKey := []byte(os.Getenv("jwt-secret"))
+	// JWT claims struct
+	type Claims struct {
+		Username string `json:"username"`
+		jwt.RegisteredClaims
+	}
+	expTime := time.Now().Add(time.Hour * 12)
+	claims := &Claims{
+		username,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expTime),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenStr, err := token.SignedString(jwtSecretKey)
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(10 * time.Hour)
-	claims["authorized"] = true
-	claims["user"] = username
+	return tokenStr, err
+}
 
-	tokenStr, err := token.SignedString(SecretKey)
+// CheckJWTValidation checks if a jwt token is valid or not.
+// Returns (username, error) tuple.
+func CheckJWTValidation(tokenStr string) (string, error) {
+	// Get the secret key from the environment variable
+	jwtSecretKey := []byte(os.Getenv("jwt-secret"))
+	// JWT claims struct
+	type Claims struct {
+		Username string `json:"username"`
+		jwt.RegisteredClaims
+	}
+	claims := &Claims{}
+	rToken, err := jwt.ParseWithClaims(tokenStr, claims,
+		func(token *jwt.Token) (interface{}, error) {
+			return jwtSecretKey, nil
+		})
 	if err != nil {
 		return "", err
 	}
-	return tokenStr, nil
+	if !rToken.Valid {
+		return "", errors.New("token is not valid")
+	}
+	return claims.Username, nil
 }
