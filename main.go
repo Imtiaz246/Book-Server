@@ -12,4 +12,5 @@ func main() {
 
 	// Start the server with Router Handler and Listen on port :3000
 	http.ListenAndServe(":3000", Router())
+
 }
