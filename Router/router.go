@@ -1,4 +1,4 @@
-package main
+package Router
 
 import (
 	"BookServer/Controllers"
@@ -47,7 +47,7 @@ func UserRoutes(r chi.Router) {
 		// Custom Auth middleware
 		//r.Use(Middleware.BasicAuth)
 		r.Use(Middleware.JwtAuth)
-		
+
 		r.Delete("/{username}", Controllers.DeleteUser)
 	})
 	// Public Routes

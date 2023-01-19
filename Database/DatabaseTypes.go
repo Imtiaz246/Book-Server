@@ -99,7 +99,7 @@ func (u *UserType) CreateAdmin() error {
 		Id:           100,
 		Username:     "imtiaz",
 		Password:     "1234",
-		Organization: "Apps-code Ltd",
+		Organization: "Appscode Ltd",
 		Email:        "imtiazuddincho246@gmail.com",
 		Role:         "admin",
 	}

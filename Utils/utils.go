@@ -3,7 +3,6 @@ package Utils
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"io"
 	"os"
@@ -12,20 +11,27 @@ import (
 
 // RestoreDataFromBackupFiles restores the backed up data
 // and store those data to the central database.
-func RestoreDataFromBackupFiles() ([]byte, []byte) {
+func RestoreDataFromBackupFiles() ([]byte, []byte, error) {
 	// Restore User data
-	uf, err := os.Open("./BackupFiles/Users.json")
+	uf, err := os.Open("./BookServer/BackupFiles/Users.json")
+	if err != nil {
+		return nil, nil, err
+	}
 	defer uf.Close()
 	usersJsonData, err := io.ReadAll(uf)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	// Restore Book data
-	bf, err := os.Open("./BackupFiles/Books.json")
+	bf, err := os.Open("./BookServer/BackupFiles/Books.json")
+	if err != nil {
+		return nil, nil, err
+	}
 	defer bf.Close()
 	booksJsonData, err := io.ReadAll(bf)
-
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return nil, nil, err
 	}
 	if len(usersJsonData) == 0 {
 		usersJsonData = []byte("{}")
@@ -33,7 +39,7 @@ func RestoreDataFromBackupFiles() ([]byte, []byte) {
 	if len(booksJsonData) == 0 {
 		booksJsonData = []byte("{}")
 	}
-	return usersJsonData, booksJsonData
+	return usersJsonData, booksJsonData, nil
 }
 
 // StoreDataToBackupFiles gets data from the central database
