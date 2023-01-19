@@ -128,15 +128,7 @@ func (d *DataBase) DbBackupScheduler() {
 		db.Lock()
 		defer db.UnLock()
 
-		// Create json objects of DataBase types
-		usersJson, err := json.Marshal(d.Users)
-		booksJson, err := json.Marshal(d.Books)
-		if err != nil {
-			log.Print(err.Error())
-			return
-		}
-		// Store into the backup files
-		err = Utils.StoreDataToBackupFiles(usersJson, booksJson)
+		err := d.DbBackup()
 		if err != nil {
 			log.Print(err.Error())
 			return
@@ -149,4 +141,17 @@ func (d *DataBase) DbBackupScheduler() {
 		os.Exit(1)
 	}
 	log.Print("Task has been scheduled successfully.")
+}
+
+// DbBackup backups the DataBase data to the BackupFiles
+func (d *DataBase) DbBackup() error {
+	// Create json objects of DataBase types
+	usersJson, err := json.Marshal(d.Users)
+	booksJson, err := json.Marshal(d.Books)
+	if err != nil {
+		return err
+	}
+	// Store into the backup files
+	err = Utils.StoreDataToBackupFiles(usersJson, booksJson)
+	return err
 }

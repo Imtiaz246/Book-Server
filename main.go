@@ -3,14 +3,22 @@ package main
 import (
 	"BookServer/Database"
 	"net/http"
+	"os"
+	"os/signal"
 )
 
 func main() {
 	// Initialize the central DataBase instance with the backed up data.
 	// Previously backed up data will be restored from BackupFiles folder if any exits.
-	Database.NewDB()
+	db := Database.NewDB()
+
+	// Catch the os signal
+	osSignalChan := make(chan os.Signal)
+	signal.Notify(osSignalChan)
 
 	// Start the server with Router Handler and Listen on port :3000
-	http.ListenAndServe(":3000", Router())
+	go http.ListenAndServe(":3000", Router())
 
+	<-osSignalChan
+	db.DbBackup()
 }
