@@ -192,7 +192,7 @@ func TestGetUser(t *testing.T) {
 	}
 	// gets the response from http
 	var testResponse Response
-	// ignore 1 pos test. it's for  test
+
 	for _, test := range tests {
 		req, err := http.NewRequest(test.Method, test.Path, test.Body)
 		req.Header.Add("Authorization", JWTToken)
@@ -226,7 +226,7 @@ func TestDeleteUser(t *testing.T) {
 	}
 	// gets the response from http
 	var testResponse Response
-	// ignore 1 pos test. it's for  test
+
 	for _, test := range tests {
 		req, err := http.NewRequest(test.Method, test.Path, test.Body)
 		req.Header.Add("Authorization", JWTToken)
@@ -347,7 +347,7 @@ func TestCreateBook(t *testing.T) {
 
 	// gets the response from http
 	var testResponse Response
-	// ignore 1 pos test. it's for  test
+
 	for _, test := range tests {
 		req, err := http.NewRequest(test.Method, test.Path, test.Body)
 		req.Header.Add("Authorization", JWTToken)
@@ -386,7 +386,7 @@ func TestGetBookList(t *testing.T) {
 	}
 	// gets the response from http
 	var testResponse Response
-	// ignore 1 pos test. it's for  test
+
 	for _, test := range tests {
 		req, err := http.NewRequest(test.Method, test.Path, test.Body)
 		req.Header.Add("Authorization", JWTToken)
@@ -420,7 +420,7 @@ func TestGetBook(t *testing.T) {
 	}
 	// gets the response from http
 	var testResponse Response
-	// ignore 1 pos test. it's for  test
+
 	for _, test := range tests {
 		req, err := http.NewRequest(test.Method, test.Path, test.Body)
 		req.Header.Add("Authorization", JWTToken)
@@ -454,7 +454,7 @@ func TestDeleteBook(t *testing.T) {
 	}
 	// gets the response from http
 	var testResponse Response
-	// ignore 1 pos test. it's for  test
+
 	for _, test := range tests {
 		req, err := http.NewRequest(test.Method, test.Path, test.Body)
 		req.Header.Add("Authorization", JWTToken)
@@ -488,7 +488,7 @@ func TestBooksOfUser(t *testing.T) {
 	}
 	// gets the response from http
 	var testResponse Response
-	// ignore 1 pos test. it's for  test
+
 	for _, test := range tests {
 		req, err := http.NewRequest(test.Method, test.Path, test.Body)
 		req.Header.Add("Authorization", JWTToken)
