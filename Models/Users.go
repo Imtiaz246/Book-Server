@@ -14,8 +14,8 @@ type User struct {
 	Password     string    `json:"password,omitempty"`
 	Organization string    `json:"organization"`
 	BookOwns     []*Book   `json:"book-owns,omitempty"`
-	CreatedAt    time.Time `json:"created-at,omitempty"`
-	UpdatedAt    time.Time `json:"updated-at,omitempty"`
+	CreatedAt    time.Time `json:"-"`
+	UpdatedAt    time.Time `json:"-"`
 }
 
 // NewUser creates a user instance, from the http request body.

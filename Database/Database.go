@@ -51,14 +51,22 @@ func NewDB() *DataBase {
 		jobDelay:   time.Second * 20,
 	}
 	// Restoring data
-	uJsonData, bJsonData := Utils.RestoreDataFromBackupFiles()
+	uJsonData, bJsonData, err := Utils.RestoreDataFromBackupFiles()
+	if err != nil {
+		log.Println("error: ", err.Error())
+		log.Fatal(err)
+		os.Exit(1)
+	}
 
-	err := json.Unmarshal(uJsonData, &db.Users)
+	err = json.Unmarshal(uJsonData, &db.Users)
 	err = json.Unmarshal(bJsonData, &db.Books)
 	if err != nil {
 		log.Fatal(err.Error())
 		os.Exit(1)
 	}
+
+	log.Println("Successfully created admin")
+
 	// Update nextUserId, nextBookId of DataBase state and
 	for _, u := range db.Users {
 		// update BooksOwns property because while doing backup and unmarshalling
@@ -83,10 +91,24 @@ func NewDB() *DataBase {
 		log.Fatal(err.Error())
 		os.Exit(1)
 	}
+
 	// Activate the Backup Scheduler.
 	// It will back up DataBase data after every certain amount of time.
 	db.DbBackupScheduler()
 
+	return &db
+}
+
+// NewTestDb initiates db for testing purpose
+func NewTestDb() *DataBase {
+	db = DataBase{
+		Users:      NewUserType(),
+		Books:      NewBookType(),
+		nextUserId: 101,
+		nextBookId: 101,
+		jobDelay:   time.Second * 20,
+	}
+	db.Users.CreateAdmin()
 	return &db
 }
 
