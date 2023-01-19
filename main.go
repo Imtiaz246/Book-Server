@@ -2,6 +2,7 @@ package main
 
 import (
 	"BookServer/Database"
+	"BookServer/Router"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,7 +18,7 @@ func main() {
 	signal.Notify(osSignalChan)
 
 	// Start the server with Router Handler and Listen on port :3000
-	go http.ListenAndServe(":3000", Router())
+	go http.ListenAndServe(":3000", Router.Router())
 
 	<-osSignalChan
 	db.DbBackup()
