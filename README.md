@@ -8,6 +8,8 @@
 ```$ go install```
 
 ```$ go run . start```  `[run the api server]`
+## To Test the API endpoints
+```$ go test ./...```  `[test the API endpoints]`
 ## Available API Endpoints
 | Method   | API Endpoint                 | Authentication Type | Payload | Description                                     |
 |----------|------------------------------|---------------------|---------|-------------------------------------------------|
