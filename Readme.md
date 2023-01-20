@@ -12,7 +12,7 @@
 | Method | API Endpoint                 | Authentication Type | Payload   | Description                                     |
 |------|------------------------------|-----------------|-----------|-------------------------------------------------|
 | `POST` | `/api/v1/users/get-token`|                 |`payload` | Return jwt token in response 
-| `POST` | `/api/v1/users` |                 | ` payload` | Creates a user if the user information is valid
+| `POST` | `/api/v1/users` |                 | `payload` | Creates a user if the user information is valid
 | `GET`  | `/api/v1/users`|                 |           | Returns the list of all user
 | `POST` | `/api/v1/users/{username}/books`|                 |           | Retuns the book of a specific user
 | `GET`  | `/api/v1/users/{username}`|                 | `payload` | Return the user specified by `{username}`
