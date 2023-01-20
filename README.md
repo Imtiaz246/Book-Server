@@ -1,7 +1,7 @@
 # Rest Book API Server in golang
 - The Book API Server provides endpoints to create, show, read, update & delete users and books.
 ## Running the server
-```$ git clone git@github.com:Imtiaz246/Book-Server.git``
+```$ git clone git@github.com:Imtiaz246/Book-Server.git```
 
 ```$ cd Book-Server```
 
