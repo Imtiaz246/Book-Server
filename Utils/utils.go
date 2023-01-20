@@ -12,8 +12,12 @@ import (
 // RestoreDataFromBackupFiles restores the backed up data
 // and store those data to the central database.
 func RestoreDataFromBackupFiles() ([]byte, []byte, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, nil, err
+	}
 	// Restore User data
-	uf, err := os.Open("./BackupFiles/Users.json")
+	uf, err := os.Open(cwd + "/BackupFiles/Users.json")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -24,7 +28,7 @@ func RestoreDataFromBackupFiles() ([]byte, []byte, error) {
 	}
 
 	// Restore Book data
-	bf, err := os.Open("./BackupFiles/Books.json")
+	bf, err := os.Open(cwd + "/BackupFiles/Books.json")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -46,11 +50,15 @@ func RestoreDataFromBackupFiles() ([]byte, []byte, error) {
 // and store those data to the backup files.
 func StoreDataToBackupFiles(userJsonData, booksJsonData []byte) error {
 	var err error
-	err = os.WriteFile("./BackupFiles/Users.json", userJsonData, 0644)
+	cwd, err := os.Getwd()
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile("./BackupFiles/Books.json", booksJsonData, 0644)
+	err = os.WriteFile(cwd+"/BackupFiles/Users.json", userJsonData, 0644)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(cwd+"/BackupFiles/Books.json", booksJsonData, 0644)
 	return err
 }
 

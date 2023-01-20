@@ -9,6 +9,7 @@ import (
 	"BookServer/Utils"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/procyon-projects/chrono"
 	"log"
 	"math"
@@ -152,6 +153,7 @@ func (d *DataBase) DbBackupScheduler() {
 
 		err := d.DbBackup()
 		if err != nil {
+			fmt.Println("kire kir eki rekire")
 			log.Print(err.Error())
 			return
 		}
