@@ -223,6 +223,16 @@ func TestDeleteUser(t *testing.T) {
 				Status: "success",
 			},
 		},
+		{
+			Method:             "DELETE",
+			Path:               "/api/v1/users/test_akkas",
+			Body:               nil,
+			ExpectedStatusCode: 406,
+			ExpectedResponse: Response{
+				Status:  "failed",
+				Message: "username not found",
+			},
+		},
 	}
 	// gets the response from http
 	var testResponse Response
@@ -448,7 +458,18 @@ func TestDeleteBook(t *testing.T) {
 			Body:               nil,
 			ExpectedStatusCode: 202,
 			ExpectedResponse: Response{
-				Status: "success",
+				Status:  "success",
+				Message: "deleted successfully",
+			},
+		},
+		{
+			Method:             "DELETE",
+			Path:               "/api/v1/books/101",
+			Body:               nil,
+			ExpectedStatusCode: 406,
+			ExpectedResponse: Response{
+				Status:  "failed",
+				Message: "book doesn't exists",
 			},
 		},
 	}

@@ -13,7 +13,7 @@ import (
 // and store those data to the central database.
 func RestoreDataFromBackupFiles() ([]byte, []byte, error) {
 	// Restore User data
-	uf, err := os.Open("./BookServer/BackupFiles/Users.json")
+	uf, err := os.Open("./BackupFiles/Users.json")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -24,7 +24,7 @@ func RestoreDataFromBackupFiles() ([]byte, []byte, error) {
 	}
 
 	// Restore Book data
-	bf, err := os.Open("./BookServer/BackupFiles/Books.json")
+	bf, err := os.Open("./BackupFiles/Books.json")
 	if err != nil {
 		return nil, nil, err
 	}
