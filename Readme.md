@@ -11,16 +11,16 @@
 ## Available API Endpoints
 | Method | API Endpoint                   | Authentication Type | Payload      | Description                                     |
 |------|--------------------------------|---------------------|--------------|-------------------------------------------------|
-| `POST` | `/api/v1/users/get-token`        | `not required`        | `payload`      | `Return jwt token in response`                    
-| `POST` | `/api/v1/users`                 | `not required`        |` payload `     | `Creates a user if the user information is valid `
-| `GET`  | `/api/v1/users`                 | `not required`        | `not required` | `Returns the list of all user                    `
-| `POST` | `/api/v1/users/{username}/books` | `not required`        | `not required` | `Retuns the book of a specific user              `
-| `GET`  | `/api/v1/users/{username}`      | `not required`        | `payload`      | `Return the user specified by {username}         `
-| `DELETE` | `/api/v1/users/{username}`      | `JWT`                 | `payload `     | `Deletes the user specified by {username}       ` 
-| `POST` | `/api/v1/books`                 | `JWT`                 | `payload`      | `Creates a books if the book information is valid`
-| `GET` | `/api/v1/books`                 | `not required`        | `not required` | `Returns all the book list`
-| `GET` | `/api/v1/books/{id}`            | `not required`        | `not required` | `Returns the book specified by the {id}`
-| `DELETE` | `/api/v1/books/{id}`            | `JWT`                 |` not required `| `Deletes the book specified by the {id}`
+| `POST` | `/api/v1/users/get-token`        | `not required`        | `payload`      | Return jwt token in response  
+| `POST` | `/api/v1/users`                 | `not required`        |` payload `     | Creates a user if the user information is valid
+| `GET`  | `/api/v1/users`                 | `not required`        | `not required` | Returns the list of all user
+| `POST` | `/api/v1/users/{username}/books` | `not required`        | `not required` | Retuns the book of a specific user
+| `GET`  | `/api/v1/users/{username}`      | `not required`        | `payload`      | Return the user specified by `{username}`
+| `DELETE` | `/api/v1/users/{username}`      | `JWT`                 | `payload `     | Deletes the user specified by `{username}`
+| `POST` | `/api/v1/books`                 | `JWT`                 | `payload`      | Creates a books if the book information is valid
+| `GET` | `/api/v1/books`                 | `not required`        | `not required` | Returns all the book list
+| `GET` | `/api/v1/books/{id}`            | `not required`        | `not required` | Returns the book specified by the `{id}`
+| `DELETE` | `/api/v1/books/{id}`            | `JWT`                 |` not required `| Deletes the book specified by the `{id}`
 
 ## Basic curl commands
 
