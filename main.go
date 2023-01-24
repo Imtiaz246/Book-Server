@@ -1,8 +1,8 @@
 package main
 
 import (
-	"BookServer/Database"
-	"BookServer/Router"
+	"github.com/Imtiaz246/Book-Server/Database"
+	"github.com/Imtiaz246/Book-Server/Router"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,7 +11,7 @@ import (
 func main() {
 	// Initialize the central DataBase instance with the backed up data.
 	// Previously backed up data will be restored from BackupFiles folder if any exits.
-	db := Database.NewDB()
+	db, _ := Database.NewDB()
 
 	// Catch the os signal
 	osSignalChan := make(chan os.Signal)

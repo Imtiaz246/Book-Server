@@ -1,11 +1,11 @@
 package Controllers
 
 import (
-	"BookServer/Database"
-	"BookServer/Models"
-	"BookServer/Utils"
 	"encoding/json"
 	"errors"
+	"github.com/Imtiaz246/Book-Server/Database"
+	"github.com/Imtiaz246/Book-Server/Models"
+	"github.com/Imtiaz246/Book-Server/Utils"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
@@ -76,7 +76,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 	err := db.DeleteUserByUserName(dUser)
 	if err != nil {
-		w.WriteHeader(http.StatusNotAcceptable)
+		w.WriteHeader(http.StatusNotFound)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}

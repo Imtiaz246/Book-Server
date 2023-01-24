@@ -1,6 +1,6 @@
 package Database
 
-import "BookServer/Models"
+import "github.com/Imtiaz246/Book-Server/Models"
 
 // CreateUser creates a user and returns its json instance
 func (d *DataBase) CreateUser(body []byte) ([]byte, error) {

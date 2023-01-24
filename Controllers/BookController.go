@@ -1,8 +1,8 @@
 package Controllers
 
 import (
-	"BookServer/Database"
-	"BookServer/Utils"
+	"github.com/Imtiaz246/Book-Server/Database"
+	"github.com/Imtiaz246/Book-Server/Utils"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
@@ -17,6 +17,7 @@ func GetBookList(w http.ResponseWriter, _ *http.Request) {
 
 	bookList, err := db.GetBooks()
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}
@@ -30,8 +31,14 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	defer db.UnLock()
 
 	bookId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
 	book, err := db.GetBookByBookId(bookId)
 	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}
@@ -45,8 +52,14 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	defer db.UnLock()
 
 	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
 	nBook, err := db.CreateBook(body)
 	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}

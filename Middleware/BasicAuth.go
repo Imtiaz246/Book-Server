@@ -1,12 +1,13 @@
 package Middleware
 
 import (
-	"BookServer/Database"
-	"BookServer/Utils"
 	"bytes"
 	"encoding/base64"
 	"errors"
+	"github.com/Imtiaz246/Book-Server/Database"
+	"github.com/Imtiaz246/Book-Server/Utils"
 	"net/http"
+	"strings"
 )
 
 func BasicAuth(next http.Handler) http.Handler {
@@ -18,8 +19,8 @@ func BasicAuth(next http.Handler) http.Handler {
 			return
 		}
 		// Get the token from the header.
-		eAuthToken := r.Header.Get("Authorization")[6:]
-		uAuthInfo, err := base64.StdEncoding.DecodeString(eAuthToken)
+		eAuthToken := strings.Split(r.Header.Get("Authorization"), " ")
+		uAuthInfo, err := base64.StdEncoding.DecodeString(eAuthToken[1])
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write(Utils.CreateErrorJson(err))

@@ -6,10 +6,9 @@
 package Database
 
 import (
-	"BookServer/Utils"
 	"context"
 	"encoding/json"
-	"fmt"
+	"github.com/Imtiaz246/Book-Server/Utils"
 	"github.com/procyon-projects/chrono"
 	"log"
 	"math"
@@ -44,7 +43,7 @@ type DataBase struct {
 // Assigns into db instance and returns its address
 // In addition it activates a Task Scheduler to perform
 // data collection and store those data to back up folders.
-func NewDB() *DataBase {
+func NewDB() (*DataBase, error) {
 	db = DataBase{
 		Users:      NewUserType(),
 		Books:      NewBookType(),
@@ -55,22 +54,21 @@ func NewDB() *DataBase {
 	// Restoring data
 	uJsonData, bJsonData, err := Utils.RestoreDataFromBackupFiles()
 	if err != nil {
-		log.Println("error: ", err.Error())
-		log.Fatal(err)
-		os.Exit(1)
+		log.Println("NewDB error: ", err.Error())
+		return nil, err
 	}
 
 	err = json.Unmarshal(uJsonData, &db.Users)
 	err = json.Unmarshal(bJsonData, &db.Books)
 	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(1)
+		log.Println("NewDB error: ", err.Error())
+		return nil, err
 	}
 
 	log.Println("Successfully created admin")
 
-	// Update nextUserId, nextBookId of DataBase state and
 	for _, u := range db.Users {
+		// Update nextUserId, nextBookId of DataBase state and
 		// update BooksOwns property because while doing backup and unmarshalling
 		// it will make a copy and assign its address which is not the actual address of books.
 		for _, b := range u.BookOwns {
@@ -98,7 +96,7 @@ func NewDB() *DataBase {
 	// It will back up DataBase data after every certain amount of time.
 	db.DbBackupScheduler()
 
-	return &db
+	return &db, nil
 }
 
 // NewTestDb initiates db for testing purpose
@@ -154,7 +152,6 @@ func (d *DataBase) DbBackupScheduler() {
 
 		err := d.DbBackup()
 		if err != nil {
-			fmt.Println("kire kir eki rekire")
 			log.Print(err.Error())
 			return
 		}
@@ -172,6 +169,9 @@ func (d *DataBase) DbBackupScheduler() {
 func (d *DataBase) DbBackup() error {
 	// Create json objects of DataBase types
 	usersJson, err := json.Marshal(d.Users)
+	if err != nil {
+		return err
+	}
 	booksJson, err := json.Marshal(d.Books)
 	if err != nil {
 		return err

@@ -1,10 +1,11 @@
 package Middleware
 
 import (
-	"BookServer/Utils"
 	"context"
 	"errors"
+	"github.com/Imtiaz246/Book-Server/Utils"
 	"net/http"
+	"strings"
 )
 
 func JwtAuth(next http.Handler) http.Handler {
@@ -16,7 +17,7 @@ func JwtAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		eAuthToken := r.Header.Get("Authorization")[7:]
+		eAuthToken := strings.Split(r.Header.Get("Authorization"), " ")[1]
 		username, err := Utils.CheckJWTValidation(eAuthToken)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)

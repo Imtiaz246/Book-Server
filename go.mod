@@ -1,4 +1,4 @@
-module BookServer
+module github.com/Imtiaz246/Book-Server
 
 go 1.19
 

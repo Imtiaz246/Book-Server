@@ -1,9 +1,9 @@
 package Database
 
 import (
-	"BookServer/Models"
-	"BookServer/Utils"
 	"errors"
+	"github.com/Imtiaz246/Book-Server/Models"
+	"github.com/Imtiaz246/Book-Server/Utils"
 	"time"
 )
 

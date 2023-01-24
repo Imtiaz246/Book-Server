@@ -1,8 +1,8 @@
 package Router
 
 import (
-	"BookServer/Controllers"
-	"BookServer/Middleware"
+	"github.com/Imtiaz246/Book-Server/Controllers"
+	"github.com/Imtiaz246/Book-Server/Middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
