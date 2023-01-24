@@ -21,9 +21,10 @@ import (
 // DataBase Stores the User and Book information.
 // As map values are inconsistent in the memory, pointers
 // of each entity with corresponding key is stored in a map.
-// Using pointer of UserType & BookType entity with respect to
-// map kay is safe because server will run concurrently and multiple
-// copy of DataBase object will lead to some dirty data.
+// Using pointer in UserType & BookType of Model.User and Model.Book entity
+// with respect to map kay is safe because maps are inconsistent in memory
+// so pointing to an absolute memory address is safe as the DataBase will
+// change consistently. This will avoid accessing some dirty data.
 // Permitted operations on DataBase object are listed on DataBaseOps.go file.
 type DataBase struct {
 	Users                  UserType
