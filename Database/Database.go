@@ -12,7 +12,6 @@ import (
 	"github.com/procyon-projects/chrono"
 	"log"
 	"math"
-	"os"
 	"sync"
 	"time"
 )
@@ -49,7 +48,7 @@ func NewDB() (*DataBase, error) {
 		Books:      NewBookType(),
 		nextUserId: 1000,
 		nextBookId: 1000,
-		jobDelay:   time.Second * 20,
+		jobDelay:   time.Second * 10,
 	}
 	// Restoring data
 	uJsonData, bJsonData, err := Utils.RestoreDataFromBackupFiles()
@@ -88,8 +87,8 @@ func NewDB() (*DataBase, error) {
 	// Create a demo admin
 	err = db.Users.CreateAdmin()
 	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(1)
+		log.Println(err.Error())
+		return nil, err
 	}
 
 	// Activate the Backup Scheduler.
@@ -144,7 +143,7 @@ func (d *DataBase) UnLock() {
 
 // DbBackupScheduler performs a task to store the data in the backup folder
 // after every db.jobDelay. The default time delay is 20 seconds.
-func (d *DataBase) DbBackupScheduler() {
+func (d *DataBase) DbBackupScheduler() error {
 	taskScheduler := chrono.NewDefaultTaskScheduler()
 	_, err := taskScheduler.ScheduleWithFixedDelay(func(ctx context.Context) {
 		db.Lock()
@@ -153,16 +152,17 @@ func (d *DataBase) DbBackupScheduler() {
 		err := d.DbBackup()
 		if err != nil {
 			log.Print(err.Error())
-			return
+		} else {
+			log.Print("Scheduled Backup Successful")
 		}
-		log.Print("Scheduled Backup Successful")
 	}, db.jobDelay /* db.jobDelay is the timer for scheduled job */)
 
 	if err != nil {
 		log.Print("Task scheduler didn't successfully started")
-		os.Exit(1)
+		return err
 	}
 	log.Print("Task has been scheduled successfully.")
+	return nil
 }
 
 // DbBackup backups the DataBase data to the BackupFiles

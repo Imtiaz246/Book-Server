@@ -46,8 +46,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	defer db.UnLock()
 
 	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
 	user, err := db.CreateUser(body)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}

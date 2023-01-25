@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -15,11 +16,18 @@ func main() {
 
 	// Catch the os signal
 	osSignalChan := make(chan os.Signal)
-	signal.Notify(osSignalChan)
+	signal.Notify(osSignalChan, os.Interrupt)
 
 	// Start the server with Router Handler and Listen on port :3000
 	go http.ListenAndServe(":3000", Router.Router())
 
-	<-osSignalChan
-	db.DbBackup()
+	for sigHandles(<-osSignalChan) {
+		db.DbBackup()
+		break
+	}
+
+}
+
+func sigHandles(sig os.Signal) bool {
+	return sig == syscall.SIGINT || sig == syscall.SIGKILL
 }

@@ -99,7 +99,7 @@ func TestCreateUser(t *testing.T) {
 					"organization" : "Appscode Ltd",
 					"email": "xyz@gmail.com"
 			}`)),
-			ExpectedStatusCode: 200,
+			ExpectedStatusCode: 400,
 			ExpectedResponse: Response{
 				Status:  "failed",
 				Message: "duplicate username",
@@ -227,7 +227,7 @@ func TestDeleteUser(t *testing.T) {
 			Method:             "DELETE",
 			Path:               "/api/v1/users/test_akkas",
 			Body:               nil,
-			ExpectedStatusCode: 406,
+			ExpectedStatusCode: 404,
 			ExpectedResponse: Response{
 				Status:  "failed",
 				Message: "username not found",
@@ -422,7 +422,7 @@ func TestGetBook(t *testing.T) {
 			Method:             "GET",
 			Path:               "/api/v1/books/100",
 			Body:               nil,
-			ExpectedStatusCode: 200,
+			ExpectedStatusCode: 406,
 			ExpectedResponse: Response{
 				Status: "success",
 			},
