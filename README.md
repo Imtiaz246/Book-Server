@@ -16,7 +16,11 @@
 
 ```$ docker build -t book-server-img .``` ```[creates the image named bookserver]```
 
-```$ docker run -p 3000:3000 -v bs-backup:/root/BackupFiles --name bookserver book-server-img``` ```[runs the container and names it bookserver]```
+```$ docker run -p 3000:3000 -v bs-backup:/root/BackupFiles --name bookserver book-server-img```
+
+## Get the Docker image
+```$ docker pull imtiazcho/book-server:latest```
+
 ## Available API Endpoints
 | Method   | API Endpoint                     | Authentication Type | Payload   | Description                                     |
 |----------|----------------------------------|--------------------|-----------|-------------------------------------------------|
