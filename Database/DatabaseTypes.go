@@ -1,6 +1,7 @@
 package Database
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/Imtiaz246/Book-Server/Models"
 	"github.com/Imtiaz246/Book-Server/Utils"
@@ -84,6 +85,26 @@ func (u *UserType) DeleteUser(username string) error {
 		return errors.New("username not found")
 	}
 	delete(*u, username)
+	return nil
+}
+
+// UpdateUser updates a user from the DataBase
+func (u *UserType) UpdateUser(username string, body []byte) error {
+	usr, found := (*u)[username]
+	if !found {
+		return errors.New("username not found")
+	}
+	var tu Models.User
+	var err error
+	err = json.Unmarshal(body, &tu)
+	if err != nil {
+		return err
+	}
+	tu.Id = usr.Id
+	if !tu.CheckValidity() {
+		return errors.New("user information is not valid")
+	}
+	(*u)[username] = &tu
 	return nil
 }
 
@@ -210,5 +231,33 @@ func (b *BookType) DeleteBook(bookId int, requestedUser string) error {
 	return errors.New("user don't have permission")
 DELETE:
 	delete(*b, bookId)
+	return nil
+}
+
+// UpdateBook updates a book from the DataBase
+func (b *BookType) UpdateBook(bookId int, requestedUser string, body []byte) error {
+	book, found := (*b)[bookId]
+	if !found {
+		return errors.New("book doesn't exists")
+	}
+	for _, a := range book.Authors {
+		if a.Username == requestedUser {
+			goto UPDATE
+		}
+	}
+	return errors.New("user don't have permission")
+UPDATE:
+	var tb Models.Book
+	err := json.Unmarshal(body, &tb)
+	if err != nil {
+		return err
+	}
+	if !tb.CheckValidity() {
+		return errors.New("book information is not valid")
+	}
+	nid := book.Id
+	tb.Id = nid
+
+	(*b)[bookId] = &tb
 	return nil
 }

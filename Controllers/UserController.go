@@ -155,3 +155,32 @@ func GetBooksOfUser(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(msg)
 }
+
+// UpdateUser updates a user information
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	db := Database.GetDB()
+	db.Lock()
+	defer db.UnLock()
+
+	u := chi.URLParam(r, "username")
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+
+	err = db.UpdateUserByUserName(u, body)
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	msg, err := Utils.CreateSuccessJson("updated successfully")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	w.Write(msg)
+}

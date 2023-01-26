@@ -33,6 +33,13 @@ func (d *DataBase) GetUserByUserName(username string) ([]byte, error) {
 	return user, err
 }
 
+// UpdateUserByUserName updates a user record from the database.
+// Returns error if any error occurs otherwise return nil
+func (d *DataBase) UpdateUserByUserName(username string, body []byte) error {
+	err := d.Users.UpdateUser(username, body)
+	return err
+}
+
 // DeleteUserByUserName deletes a user record from the database.
 // Returns error if any error occurs otherwise return nil
 func (d *DataBase) DeleteUserByUserName(username string) error {
@@ -61,5 +68,11 @@ func (d *DataBase) GetBookByBookId(bookId int) ([]byte, error) {
 // DeleteBookByBookId returns book information specified by param{bookId}
 func (d *DataBase) DeleteBookByBookId(bookId int, requestedUser string) error {
 	err := d.Books.DeleteBook(bookId, requestedUser)
+	return err
+}
+
+// UpdateBookByBookId updates book information specified by param{bookId}
+func (d *DataBase) UpdateBookByBookId(bookId int, requestedUser string, body []byte) error {
+	err := d.Books.UpdateBook(bookId, requestedUser, body)
 	return err
 }

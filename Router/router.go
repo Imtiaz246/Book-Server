@@ -14,7 +14,6 @@ func Router() http.Handler {
 
 	// Middleware lists
 	r.Use(middleware.Logger)
-
 	// Add common Header for all routes
 	r.Use(Middleware.AddHeaders)
 
@@ -35,6 +34,7 @@ func BookRoutes(r chi.Router) {
 
 		r.Post("/", Controllers.CreateBook)
 		r.Delete("/{id}", Controllers.DeleteBook)
+		r.Put("/{id}", Controllers.UpdateBook)
 	})
 	// Public Routes
 	r.Get("/", Controllers.GetBookList)
@@ -49,6 +49,7 @@ func UserRoutes(r chi.Router) {
 		r.Use(Middleware.JwtAuth)
 
 		r.Delete("/{username}", Controllers.DeleteUser)
+		r.Put("/{username}", Controllers.UpdateUser)
 	})
 	// Public Routes
 	r.Post("/", Controllers.CreateUser)

@@ -88,7 +88,44 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	}
 	msg, err := Utils.CreateSuccessJson("deleted successfully")
 	if err != nil {
-		w.WriteHeader(http.StatusNotAcceptable)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+	w.Write(msg)
+}
+
+// UpdateBook updates a book specifies by param{bookId}
+func UpdateBook(w http.ResponseWriter, r *http.Request) {
+	db := Database.GetDB()
+	db.Lock()
+	defer db.UnLock()
+
+	ru := r.Context().Value("username").(string)
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	// check if the user is the actual author of the book or not
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+	err = db.UpdateBookByBookId(id, ru, body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(Utils.CreateErrorJson(err))
+		return
+	}
+
+	msg, err := Utils.CreateSuccessJson("updated successfully")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(Utils.CreateErrorJson(err))
 		return
 	}
