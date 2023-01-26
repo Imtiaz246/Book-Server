@@ -1,9 +1,9 @@
-package Middleware
+package middlewares
 
 import (
 	"context"
 	"errors"
-	"github.com/Imtiaz246/Book-Server/Utils"
+	"github.com/Imtiaz246/Book-Server/utils"
 	"net/http"
 	"strings"
 )
@@ -13,15 +13,15 @@ func JwtAuth(next http.Handler) http.Handler {
 		ai := r.Header.Get("Authorization")
 		if len(ai) == 0 {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write(Utils.CreateErrorJson(errors.New("authentication required")))
+			w.Write(utils.CreateErrorJson(errors.New("authentication required")))
 			return
 		}
 
 		eAuthToken := strings.Split(r.Header.Get("Authorization"), " ")[1]
-		username, err := Utils.CheckJWTValidation(eAuthToken)
+		username, err := utils.CheckJWTValidation(eAuthToken)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write(Utils.CreateErrorJson(err))
+			w.Write(utils.CreateErrorJson(err))
 			return
 		}
 

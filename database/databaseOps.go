@@ -1,6 +1,6 @@
-package Database
+package database
 
-import "github.com/Imtiaz246/Book-Server/Models"
+import "github.com/Imtiaz246/Book-Server/models"
 
 // CreateUser creates a user and returns its json instance
 func (d *DataBase) CreateUser(body []byte) ([]byte, error) {
@@ -22,7 +22,7 @@ func (d *DataBase) Authenticate(u, p string) error {
 }
 
 // AuthenticateUsersExistence checks if a list of user is exists in the DataBase or not.
-func (d *DataBase) AuthenticateUsersExistence(users []*Models.User) error {
+func (d *DataBase) AuthenticateUsersExistence(users []*models.User) error {
 	err := d.Users.UsersExistence(users)
 	return err
 }

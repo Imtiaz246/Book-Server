@@ -1,8 +1,8 @@
-package Controllers
+package controllers
 
 import (
-	"github.com/Imtiaz246/Book-Server/Database"
-	"github.com/Imtiaz246/Book-Server/Utils"
+	"github.com/Imtiaz246/Book-Server/database"
+	"github.com/Imtiaz246/Book-Server/utils"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
@@ -11,14 +11,14 @@ import (
 
 // GetBookList returns all the book list
 func GetBookList(w http.ResponseWriter, _ *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
 	bookList, err := db.GetBooks()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.Write(bookList)
@@ -26,20 +26,20 @@ func GetBookList(w http.ResponseWriter, _ *http.Request) {
 
 // GetBook returns a specific book information associated with id
 func GetBook(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
 	bookId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	book, err := db.GetBookByBookId(bookId)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.Write(book)
@@ -47,20 +47,20 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 
 // CreateBook creates a book. Returns the created book
 func CreateBook(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	nBook, err := db.CreateBook(body)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.Write(nBook)
@@ -68,7 +68,7 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 
 // DeleteBook deletes a book specified by the param{bookId}
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 	// checks if the request comes from admin or author
@@ -77,19 +77,19 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	bookId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	err = db.DeleteBookByBookId(bookId, requestedUser)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
-	msg, err := Utils.CreateSuccessJson("deleted successfully")
+	msg, err := utils.CreateSuccessJson("deleted successfully")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.WriteHeader(http.StatusAccepted)
@@ -98,7 +98,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 
 // UpdateBook updates a book specifies by param{bookId}
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
@@ -107,26 +107,26 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	// check if the user is the actual author of the book or not
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	err = db.UpdateBookByBookId(id, ru, body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 
-	msg, err := Utils.CreateSuccessJson("updated successfully")
+	msg, err := utils.CreateSuccessJson("updated successfully")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.WriteHeader(http.StatusAccepted)

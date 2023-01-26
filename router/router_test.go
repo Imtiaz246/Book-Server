@@ -1,10 +1,10 @@
-package Router
+package router
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/Imtiaz246/Book-Server/Database"
+	"github.com/Imtiaz246/Book-Server/database"
 	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
@@ -28,7 +28,7 @@ type Test struct {
 var JWTToken string
 
 func init() {
-	Database.NewTestDb()
+	database.NewTestDb()
 }
 
 func TestGetToken(t *testing.T) {
@@ -528,3 +528,5 @@ func TestBooksOfUser(t *testing.T) {
 		//require.Equal(t, test.ExpectedResponse, testResponse)
 	}
 }
+
+// todo: update book & update user

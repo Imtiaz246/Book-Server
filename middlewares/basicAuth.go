@@ -1,11 +1,11 @@
-package Middleware
+package middlewares
 
 import (
 	"bytes"
 	"encoding/base64"
 	"errors"
-	"github.com/Imtiaz246/Book-Server/Database"
-	"github.com/Imtiaz246/Book-Server/Utils"
+	"github.com/Imtiaz246/Book-Server/database"
+	"github.com/Imtiaz246/Book-Server/utils"
 	"net/http"
 	"strings"
 )
@@ -15,7 +15,7 @@ func BasicAuth(next http.Handler) http.Handler {
 		ai := r.Header.Get("Authorization")
 		if ai == "" {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write(Utils.CreateErrorJson(errors.New("authentication required")))
+			w.Write(utils.CreateErrorJson(errors.New("authentication required")))
 			return
 		}
 		// Get the token from the header.
@@ -23,18 +23,18 @@ func BasicAuth(next http.Handler) http.Handler {
 		uAuthInfo, err := base64.StdEncoding.DecodeString(eAuthToken[1])
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write(Utils.CreateErrorJson(err))
+			w.Write(utils.CreateErrorJson(err))
 			return
 		}
 		cx := bytes.Index(uAuthInfo, []byte(":"))
 		username := string(uAuthInfo[:cx])
 		password := string(uAuthInfo[cx+1:])
 
-		db := Database.GetDB()
+		db := database.GetDB()
 		db.Lock()
 
 		if err = db.Authenticate(username, password); err != nil {
-			w.Write(Utils.CreateErrorJson(err))
+			w.Write(utils.CreateErrorJson(err))
 			db.UnLock()
 			return
 		}

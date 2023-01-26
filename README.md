@@ -5,7 +5,7 @@
 
 ```$ cd Book-Server```
 
-```$ go install```
+```$ go mod download```
 
 ```$ go run . start```  `[run the api server]`
 ## To Test the API endpoints
@@ -14,7 +14,7 @@
 ## Run the server in Docker
 ```$ docker volume create bs-backup``` ```[creates a volume for backup]```
 
-```$ docker build -t book-server-img .``` ```[creates the image named bookserver]```
+```$ docker build -t book-server-img .``` ```[creates the image named book-server-img]```
 
 ```$ docker run -p 3000:3000 -v bs-backup:/root/BackupFiles --name bookserver book-server-img```
 

@@ -1,18 +1,18 @@
-package Database
+package database
 
 import (
 	"encoding/json"
 	"errors"
-	"github.com/Imtiaz246/Book-Server/Models"
-	"github.com/Imtiaz246/Book-Server/Utils"
+	"github.com/Imtiaz246/Book-Server/models"
+	"github.com/Imtiaz246/Book-Server/utils"
 	"time"
 )
 
 // UserType is a custom type which maps kay(username), value(*Model.User)
-type UserType map[string]*Models.User
+type UserType map[string]*models.User
 
 // BookType is a custom type which maps key(bookId), value(*Model.Book)
-type BookType map[int]*Models.Book
+type BookType map[int]*models.Book
 
 // NewUserType creates a new UserType and returns the instance
 func NewUserType() UserType {
@@ -29,7 +29,7 @@ func NewBookType() BookType {
 // Insert tries to add a user to the database. If a username already exists,
 // it returns a (nil, error) tuple otherwise returns the (json user object, nil) tuple
 func (u *UserType) Insert(body []byte) ([]byte, error) {
-	user, err := Models.NewUser(body)
+	user, err := models.NewUser(body)
 	if err != nil || !user.CheckValidity() {
 		if err == nil {
 			err = errors.New("user information is not valid")
@@ -48,20 +48,20 @@ func (u *UserType) Insert(body []byte) ([]byte, error) {
 	user.UpdatedAt = user.CreatedAt
 
 	(*u)[username] = user
-	uJson, err := Utils.CreateSuccessJson(user)
+	uJson, err := utils.CreateSuccessJson(user)
 	return uJson, err
 }
 
 // Gets returns all the user from the database in the json format.
 // In addition, sends error if any occurs.
 func (u *UserType) Gets() ([]byte, error) {
-	var users []*Models.User
+	var users []*models.User
 	for _, user := range *u {
 		cUser := *user
 		cUser.Password = ""
 		users = append(users, &cUser)
 	}
-	uJson, err := Utils.CreateSuccessJson(users)
+	uJson, err := utils.CreateSuccessJson(users)
 	return uJson, err
 }
 
@@ -74,7 +74,7 @@ func (u *UserType) Get(username string) ([]byte, error) {
 		err := errors.New("username doesn't exists")
 		return nil, err
 	}
-	uJson, err := Utils.CreateSuccessJson(user)
+	uJson, err := utils.CreateSuccessJson(user)
 	return uJson, err
 }
 
@@ -94,7 +94,7 @@ func (u *UserType) UpdateUser(username string, body []byte) error {
 	if !found {
 		return errors.New("username not found")
 	}
-	var tu Models.User
+	var tu models.User
 	var err error
 	err = json.Unmarshal(body, &tu)
 	if err != nil {
@@ -116,7 +116,7 @@ func (u *UserType) CreateAdmin() error {
 	if found {
 		return nil
 	}
-	admin := Models.User{
+	admin := models.User{
 		Id:           100,
 		Username:     "imtiaz",
 		Password:     "1234",
@@ -149,7 +149,7 @@ func (u *UserType) CheckCredentials(username, password string) error {
 
 // UsersExistence checks if a list of user is exists in DataBase or not.
 // if not exists returns an error.
-func (u *UserType) UsersExistence(users []*Models.User) error {
+func (u *UserType) UsersExistence(users []*models.User) error {
 	for _, usr := range users {
 		_, found := (*u)[usr.Username]
 		if !found {
@@ -165,7 +165,7 @@ func (u *UserType) UsersExistence(users []*Models.User) error {
 // If the information is not valid it returns (nil, err) tuple,
 // otherwise returns (json book object, nil) tuple.
 func (b *BookType) Insert(body []byte) ([]byte, error) {
-	book, err := Models.NewBook(body)
+	book, err := models.NewBook(body)
 	if err != nil || !book.CheckValidity() {
 		if err == nil {
 			err = errors.New("book information is not valid")
@@ -189,18 +189,18 @@ func (b *BookType) Insert(body []byte) ([]byte, error) {
 	book.UpdatedAt = book.PublishDate
 
 	(*b)[book.Id] = book
-	bJson, err := Utils.CreateSuccessJson(book)
+	bJson, err := utils.CreateSuccessJson(book)
 	return bJson, err
 }
 
 // Gets return all the book from the database without book-content
 func (b *BookType) Gets() ([]byte, error) {
-	var books []*Models.Book
+	var books []*models.Book
 	for _, book := range *b {
-		book.BookContent = Models.BookContent{}
+		book.BookContent = models.BookContent{}
 		books = append(books, book)
 	}
-	bJson, err := Utils.CreateSuccessJson(books)
+	bJson, err := utils.CreateSuccessJson(books)
 	return bJson, err
 }
 
@@ -213,7 +213,7 @@ func (b *BookType) Get(bookId int) ([]byte, error) {
 		err := errors.New("book doesn't exists")
 		return nil, err
 	}
-	bJson, err := Utils.CreateSuccessJson(book)
+	bJson, err := utils.CreateSuccessJson(book)
 	return bJson, err
 }
 
@@ -247,7 +247,7 @@ func (b *BookType) UpdateBook(bookId int, requestedUser string, body []byte) err
 	}
 	return errors.New("user don't have permission")
 UPDATE:
-	var tb Models.Book
+	var tb models.Book
 	err := json.Unmarshal(body, &tb)
 	if err != nil {
 		return err

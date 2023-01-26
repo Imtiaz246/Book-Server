@@ -1,14 +1,14 @@
-// Package Database implements a basic database module for the Book-server.
+// Package database implements a basic database module for the Book-server.
 // It provides a global 'db' object of type DataBase
 // which is the central data storage for the Book-server.
 // The db object can be created from backup files using NewDB function,
 // and the pointer instance of the db object can be got by GetDB function.
-package Database
+package database
 
 import (
 	"context"
 	"encoding/json"
-	"github.com/Imtiaz246/Book-Server/Utils"
+	"github.com/Imtiaz246/Book-Server/utils"
 	"github.com/procyon-projects/chrono"
 	"log"
 	"math"
@@ -48,10 +48,10 @@ func NewDB() (*DataBase, error) {
 		Books:      NewBookType(),
 		nextUserId: 1000,
 		nextBookId: 1000,
-		jobDelay:   time.Second * 10,
+		jobDelay:   time.Second * 20,
 	}
 	// Restoring data
-	uJsonData, bJsonData, err := Utils.RestoreDataFromBackupFiles()
+	uJsonData, bJsonData, err := utils.RestoreDataFromBackupFiles()
 	if err != nil {
 		log.Println("NewDB error: ", err.Error())
 		return nil, err
@@ -177,6 +177,6 @@ func (d *DataBase) DbBackup() error {
 		return err
 	}
 	// Store into the backup files
-	err = Utils.StoreDataToBackupFiles(usersJson, booksJson)
+	err = utils.StoreDataToBackupFiles(usersJson, booksJson)
 	return err
 }

@@ -1,11 +1,11 @@
-package Controllers
+package controllers
 
 import (
 	"encoding/json"
 	"errors"
-	"github.com/Imtiaz246/Book-Server/Database"
-	"github.com/Imtiaz246/Book-Server/Models"
-	"github.com/Imtiaz246/Book-Server/Utils"
+	"github.com/Imtiaz246/Book-Server/database"
+	"github.com/Imtiaz246/Book-Server/models"
+	"github.com/Imtiaz246/Book-Server/utils"
 	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 
 // GetUserList returns all the User list in a json format
 func GetUserList(w http.ResponseWriter, _ *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
@@ -27,7 +27,7 @@ func GetUserList(w http.ResponseWriter, _ *http.Request) {
 
 // GetUser returns a specific User information associated with id
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
@@ -41,20 +41,20 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 // CreateUser creates a User. Returns the created User
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	user, err := db.CreateUser(body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.Write(user)
@@ -62,7 +62,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUser deletes a User specified by the param{UserId}
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
@@ -71,25 +71,25 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	rUser := r.Context().Value("username").(string)
 	if db.Users[rUser].Role != "admin" {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write(Utils.CreateErrorJson(errors.New("don't have permission to delete a user")))
+		w.Write(utils.CreateErrorJson(errors.New("don't have permission to delete a user")))
 		return
 	}
 	// if rUser == dUser then it's admin
 	if rUser == dUser {
 		w.WriteHeader(http.StatusForbidden)
-		w.Write(Utils.CreateErrorJson(errors.New("can't delete the admin")))
+		w.Write(utils.CreateErrorJson(errors.New("can't delete the admin")))
 		return
 	}
 	err := db.DeleteUserByUserName(dUser)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
-	msg, err := Utils.CreateSuccessJson("deleted successfully")
+	msg, err := utils.CreateSuccessJson("deleted successfully")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.WriteHeader(http.StatusAccepted)
@@ -100,7 +100,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 // First it tries to authenticate the user credentials.
 // If the credentials is valid then it generates a jwt token and returns it.
 func GetToken(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 	// User Credentials struct
@@ -111,27 +111,27 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 	body, _ := io.ReadAll(r.Body)
 	err := json.Unmarshal(body, &uc)
 	if err != nil {
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 
 	// Check if the user credentials is valid or not
 	err = db.Authenticate(uc.Username, uc.Password)
 	if err != nil {
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 
 	// Generate token and respond it
-	tokenStr, err := Utils.GenerateJwtToken(uc.Username)
+	tokenStr, err := utils.GenerateJwtToken(uc.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
-	msg, err := Utils.CreateSuccessJson(tokenStr)
+	msg, err := utils.CreateSuccessJson(tokenStr)
 	if err != nil {
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.Write(msg)
@@ -139,18 +139,18 @@ func GetToken(w http.ResponseWriter, r *http.Request) {
 
 // GetBooksOfUser returns the book list of a user defined by param{username}
 func GetBooksOfUser(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
 	books := db.Users[chi.URLParam(r, "username")].BookOwns
 	for _, b := range books {
-		b.Authors = []*Models.User{}
+		b.Authors = []*models.User{}
 	}
-	msg, err := Utils.CreateSuccessJson(books)
+	msg, err := utils.CreateSuccessJson(books)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.Write(msg)
@@ -158,7 +158,7 @@ func GetBooksOfUser(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUser updates a user information
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	db := Database.GetDB()
+	db := database.GetDB()
 	db.Lock()
 	defer db.UnLock()
 
@@ -166,20 +166,20 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 
 	err = db.UpdateUserByUserName(u, body)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
-	msg, err := Utils.CreateSuccessJson("updated successfully")
+	msg, err := utils.CreateSuccessJson("updated successfully")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(Utils.CreateErrorJson(err))
+		w.Write(utils.CreateErrorJson(err))
 		return
 	}
 	w.Write(msg)
