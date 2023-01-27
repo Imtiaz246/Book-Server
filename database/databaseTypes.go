@@ -105,7 +105,9 @@ func (u *UserType) UpdateUser(username string, body []byte) error {
 		return errors.New("user information is not valid")
 	}
 	(*u)[tu.Username] = &tu
-	delete(*u, username)
+	if username != tu.Username {
+		delete(*u, username)
+	}
 	return nil
 }
 
