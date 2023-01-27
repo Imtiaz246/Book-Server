@@ -22,7 +22,6 @@ var (
 		Short: "starts the server",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(adminName, adminPassword, port)
 			startServer()
 		},
 	}

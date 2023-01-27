@@ -122,7 +122,7 @@ func GenerateJwtToken(username string) (string, error) {
 // Returns (username, error) tuple.
 func CheckJWTValidation(tokenStr string) (string, error) {
 	// Get the secret key from the environment variable
-	jwtSecretKey := []byte(os.Getenv("jwt-secret"))
+	jwtSecretKey := []byte(os.Getenv("JWT_SECRET_KEY"))
 	// JWT claims struct
 	type Claims struct {
 		Username string `json:"username"`

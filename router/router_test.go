@@ -141,8 +141,8 @@ func TestGetUserList(t *testing.T) {
 						"id":           float64(100),
 						"role":         "admin",
 						"username":     "imtiaz",
-						"organization": "Appscode Ltd",
-						"email":        "imtiazuddincho246@gmail.com",
+						"organization": "",
+						"email":        "",
 						"name":         "",
 					},
 					map[string]any{
@@ -209,6 +209,73 @@ func TestGetUser(t *testing.T) {
 		require.Equal(t, test.ExpectedStatusCode, res.Code)
 		//// test response body
 		//require.Equal(t, test.ExpectedResponse, testResponse)
+	}
+}
+
+func TestUpdateUser(t *testing.T) {
+	tests := []Test{
+		{
+			Method: "PUT",
+			Path:   "/api/v1/users/test_akkas",
+			Body: bytes.NewReader([]byte(`{
+   				"username" : "test_akkas_updated",
+   				"password" : "1234",
+				"organization" : "Appscode Ltd",
+   				"email": "xyz@gmail.com"}`)),
+			ExpectedStatusCode: 200,
+			ExpectedResponse: Response{
+				Status:  "success",
+				Message: "updated successfully",
+			},
+		},
+		{
+			Method: "PUT",
+			Path:   "/api/v1/users/test_akkas_updated",
+			Body: bytes.NewReader([]byte(`{
+				"username" : "test_akkas",
+				"password" : "1234",
+				"organization" : "Appscode Ltd",
+				"email": "xyz@gmail.com"}`)),
+			ExpectedStatusCode: 200,
+			ExpectedResponse: Response{
+				Status:  "success",
+				Message: "updated successfully",
+			},
+		},
+		{
+			Method: "PUT",
+			Path:   "/api/v1/users/test_akkas_updated",
+			Body: bytes.NewReader([]byte(`{
+				"username" : "test_akkas",
+				"password" : "1234",
+				"organization" : "Appscode Ltd",
+				"email": "xyz@gmail.com"}`)),
+			ExpectedStatusCode: 406,
+			ExpectedResponse: Response{
+				Status:  "failed",
+				Message: "username not found",
+			},
+		},
+	}
+	// gets the response from http
+	var testResponse Response
+
+	for _, test := range tests {
+		req, err := http.NewRequest(test.Method, test.Path, test.Body)
+		req.Header.Add("Authorization", JWTToken)
+		require.Equal(t, err, nil)
+
+		res := httptest.NewRecorder()
+		Router().ServeHTTP(res, req)
+
+		body, _ := io.ReadAll(res.Body)
+		err = json.Unmarshal(body, &testResponse)
+
+		require.Equal(t, err, nil)
+		// test code
+		require.Equal(t, test.ExpectedStatusCode, res.Code)
+		// test response body
+		require.Equal(t, test.ExpectedResponse, testResponse)
 	}
 }
 
@@ -450,6 +517,63 @@ func TestGetBook(t *testing.T) {
 	}
 }
 
+func TestUpdateBook(t *testing.T) {
+	tests := []Test{
+		{
+			Method: "PUT",
+			Path:   "/api/v1/books/101",
+			Body: bytes.NewReader([]byte(`{
+				"book-name": "update",
+				"price": 200,
+				"isbn" : "4323-6456-4756-4564",
+				"authors" : [
+					{
+						"username": "imtiaz"
+					}
+				],
+				"book-content": {
+					"over-view": "overview",
+					"chapters" : [
+						{
+							"chapter-title": "chapter 1",
+							"chapter-content": "chapter 1 content"
+						},
+						{
+							"chapter-title": "chapter 2",
+							"chapter-content": "chapter 2 content"
+						}
+					]
+				}
+			}`)),
+			ExpectedStatusCode: 202,
+			ExpectedResponse: Response{
+				Status:  "success",
+				Message: "updated successfully",
+			},
+		},
+	}
+	// gets the response from http
+	var testResponse Response
+
+	for _, test := range tests {
+		req, err := http.NewRequest(test.Method, test.Path, test.Body)
+		req.Header.Add("Authorization", JWTToken)
+		require.Equal(t, err, nil)
+
+		res := httptest.NewRecorder()
+		Router().ServeHTTP(res, req)
+
+		body, _ := io.ReadAll(res.Body)
+		err = json.Unmarshal(body, &testResponse)
+
+		require.Equal(t, err, nil)
+		// test code
+		require.Equal(t, test.ExpectedStatusCode, res.Code)
+		// test response body
+		require.Equal(t, test.ExpectedResponse, testResponse)
+	}
+}
+
 func TestDeleteBook(t *testing.T) {
 	tests := []Test{
 		{
@@ -528,5 +652,3 @@ func TestBooksOfUser(t *testing.T) {
 		//require.Equal(t, test.ExpectedResponse, testResponse)
 	}
 }
-
-// todo: update book & update user
