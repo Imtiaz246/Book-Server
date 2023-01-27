@@ -216,44 +216,29 @@ func TestUpdateUser(t *testing.T) {
 	tests := []Test{
 		{
 			Method: "PUT",
-			Path:   "/api/v1/users/test_akkas",
+			Path:   "/api/v1/users/imtiaz",
 			Body: bytes.NewReader([]byte(`{
-   				"username" : "test_akkas_updated",
+   				"username" : "imtiaz_updated",
    				"password" : "1234",
 				"organization" : "Appscode Ltd",
    				"email": "xyz@gmail.com"}`)),
-			ExpectedStatusCode: 200,
-			ExpectedResponse: Response{
-				Status:  "success",
-				Message: "updated successfully",
-			},
-		},
-		{
-			Method: "PUT",
-			Path:   "/api/v1/users/test_akkas_updated",
-			Body: bytes.NewReader([]byte(`{
-				"username" : "test_akkas",
-				"password" : "1234",
-				"organization" : "Appscode Ltd",
-				"email": "xyz@gmail.com"}`)),
-			ExpectedStatusCode: 200,
-			ExpectedResponse: Response{
-				Status:  "success",
-				Message: "updated successfully",
-			},
-		},
-		{
-			Method: "PUT",
-			Path:   "/api/v1/users/test_akkas_updated",
-			Body: bytes.NewReader([]byte(`{
-				"username" : "test_akkas",
-				"password" : "1234",
-				"organization" : "Appscode Ltd",
-				"email": "xyz@gmail.com"}`)),
 			ExpectedStatusCode: 406,
 			ExpectedResponse: Response{
 				Status:  "failed",
-				Message: "username not found",
+				Message: "can't update username",
+			},
+		},
+		{
+			Method: "PUT",
+			Path:   "/api/v1/users/imtiaz",
+			Body: bytes.NewReader([]byte(`{
+				"password" : "1234",
+				"organization" : "Appscode Ltd",
+				"email": "xyz@gmail.com"}`)),
+			ExpectedStatusCode: 200,
+			ExpectedResponse: Response{
+				Status:  "success",
+				Message: "updated successfully",
 			},
 		},
 	}

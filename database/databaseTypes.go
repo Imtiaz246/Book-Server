@@ -89,10 +89,13 @@ func (u *UserType) DeleteUser(username string) error {
 }
 
 // UpdateUser updates a user from the DataBase
-func (u *UserType) UpdateUser(username string, body []byte) error {
+func (u *UserType) UpdateUser(username, requestedUser string, body []byte) error {
 	usr, found := (*u)[username]
 	if !found {
 		return errors.New("username not found")
+	}
+	if requestedUser != username {
+		return errors.New("forbidden")
 	}
 	var tu models.User
 	var err error
@@ -101,13 +104,18 @@ func (u *UserType) UpdateUser(username string, body []byte) error {
 		return err
 	}
 	tu.Id = usr.Id
+	// Assign previous role, can't update role
+	tu.Role = usr.Role
+	// can't update username
+	if tu.Username != "" {
+		return errors.New("can't update username")
+	}
+	tu.Username = usr.Username
 	if !tu.CheckValidity() {
 		return errors.New("user information is not valid")
 	}
 	(*u)[tu.Username] = &tu
-	if username != tu.Username {
-		delete(*u, username)
-	}
+
 	return nil
 }
 

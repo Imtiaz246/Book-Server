@@ -170,7 +170,8 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.UpdateUserByUserName(u, body)
+	requestedUser := r.Context().Value("username").(string)
+	err = db.UpdateUserByUserName(u, requestedUser, body)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
 		w.Write(utils.CreateErrorJson(err))
