@@ -110,22 +110,22 @@ func (u *UserType) UpdateUser(username string, body []byte) error {
 
 // CreateAdmin creates an admin for the server.
 // Admin has permission to delete user and also books.
-// Admin is created with username "imtiaz" and password "1234"
-func (u *UserType) CreateAdmin() error {
-	_, found := (*u)["imtiaz"]
-	if found {
-		return nil
+func (u *UserType) CreateAdmin(usr, pass string) error {
+	// Delete the existing admin
+	for k, v := range *u {
+		if v.Role == "admin" {
+			delete(*u, k)
+			break
+		}
 	}
-	admin := models.User{
-		Id:           100,
-		Username:     "imtiaz",
-		Password:     "1234",
-		Organization: "Appscode Ltd",
-		Email:        "imtiazuddincho246@gmail.com",
-		Role:         "admin",
+	a := models.User{
+		Id:       100,
+		Username: usr,
+		Password: pass,
+		Role:     "admin",
 	}
-	(*u)[admin.Username] = &admin
-	_, found = (*u)[admin.Username]
+	(*u)[usr] = &a
+	_, found := (*u)[usr]
 	if !found {
 		return errors.New("can't create admin")
 	}

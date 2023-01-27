@@ -9,5 +9,6 @@ FROM alpine:latest
 WORKDIR /root/
 COPY --from=builder /app/BackupFiles ./BackupFiles
 COPY --from=builder /app/main .
+COPY --from=builder /app/.env .
 EXPOSE 3000
-CMD ["./main"]
+CMD ["./main", "-p=3000"]
