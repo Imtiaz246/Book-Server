@@ -1,20 +1,35 @@
 # Rest Book API Server in golang
 - The Book API Server provides endpoints to create, show, read, update & delete users and books.
-## Running the server
+## Run the server on local machine
 ```$ git clone git@github.com:Imtiaz246/Book-Server.git```
 
 ```$ cd Book-Server```
 
 ```$ go mod download```
 
-```$ go run . start```  `[run the api server]`
+```& echo -e "ADMIN_USERNAME=\nADMIN_PASSWORD=\nJWT_SECRET_KEY=\n" > .env```
+
+#### Setup environment variables in .env file
+```gotemplate
+ADMIN_USERNAME=
+ADMIN_PASSWORD=
+JWT_SECRET_KEY=
+```
+
+```$ go build -o main```
+
+```$ ./main --port=3000```
+
 ## To Test the API endpoints
 ```$ go test ./...```  `[test the API endpoints]`
+
+## To check the version
+```./main version```
 
 ## Run the server in Docker
 ```$ docker volume create bs-backup``` ```[creates a volume for backup]```
 
-```$ docker build -t book-server-img .``` ```[creates the image named book-server-img]```
+```$ docker build -t book-server-img .```
 
 ```$ docker run -p 3000:3000 -v bs-backup:/root/BackupFiles --name bookserver book-server-img```
 
@@ -50,24 +65,23 @@ curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/users
 ```
 3. Get book list of a user 
 ```shell
- curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/users/imtiaz/books
+ curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/users/{usrname}/books
 ```
 4. Get a user by username 
 ```shell
-curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/users/lakkas
+curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/users/{username}
 ```
-
 5. Delete a user by username
 ```shell
-curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -X DELETE http://localhost:3000/api/v1/users/lakkas
+curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -X DELETE http://localhost:3000/api/v1/users/{username}
 ```
 6. Update a user by username
 ```shell
-curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -d '{ "username" : "lakkas updated", "password" : "1234", "organization" : "Appscode Ltd", "email": "xyz@gmail.com" }' -X PUT http://localhost:3000/api/v1/users/lakkas
+curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -d '{ "username" : "lakkas updated", "password" : "1234", "organization" : "Appscode Ltd", "email": "xyz@gmail.com" }' -X PUT http://localhost:3000/api/v1/users/{username}
 ```
 7. Create a book
 ```shell
-curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -X POST -d '{ "book-name": "new book", "price": 200, "isbn": "4323-6456-4756-4564", "authors": [ { "username": "imtiaz" } ], "book-content": { "over-view": "overview", "chapters": [ { "chapter-title": "chapter 1", "chapter-content": "chapter 1 content" }, { "chapter-title": "chapter 2", "chapter-content": "chapter 2 content" } ] } }' http://localhost:3000/api/v1/books`
+curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -X POST -d '{ "book-name": "new book", "price": 200, "isbn": "4323-6456-4756-4564", "authors": [ { "username": "admin" } ], "book-content": { "over-view": "overview", "chapters": [ { "chapter-title": "chapter 1", "chapter-content": "chapter 1 content" }, { "chapter-title": "chapter 2", "chapter-content": "chapter 2 content" } ] } }' http://localhost:3000/api/v1/books`
 ```
 8. Get all book list
 ```shell
@@ -75,18 +89,17 @@ curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/books
 ```
 9. Get a book by book-id
 ```shell
-curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/books/1000
+curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/books/{id}
 ```
 10. Delete a book by book-id
 ```shell
-curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -X DELETE http://localhost:3000/api/v1/books/1000
+curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -X DELETE http://localhost:3000/api/v1/books/{id}
 ```
 11. Update a book by book-id
 ```shell
-curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -X PUT -d '{ "book-name": "updated book curl", "price": 200, "isbn": "4323-6456-4756-4564", "authors": [ { "username": "imtiaz" } ], "book-content": { "over-view": "Haire over-view", "chapters": [ { "chapter-title": "chapter 1", "chapter-content": "chapter 1 content" }, { "chapter-title": "chapter 2", "chapter-content": "chapter 2 content" } ] } }' http://localhost:3000/api/v1/books/1000
+curl -v -H "Content-type: application/json" -H "Authorization: Bearer <jwt token>" -X PUT -d '{ "book-name": "updated book curl", "price": 200, "isbn": "4323-6456-4756-4564", "authors": [ { "username": "admin" } ], "book-content": { "over-view": "overview", "chapters": [ { "chapter-title": "chapter 1", "chapter-content": "chapter 1 content" }, { "chapter-title": "chapter 2", "chapter-content": "chapter 2 content" } ] } }' http://localhost:3000/api/v1/books/{id}
 ```
-
 12. Get a jwt token
 ```shell
-curl -v -H "Content-type: application/json" -d '{ "username": "imtiaz", "password": "1234" }' http://localhost:3000/api/v1/users/get-token`
+curl -v -H "Content-type: application/json" -d '{ "username": "admin", "password": "1234" }' http://localhost:3000/api/v1/users/get-token`
 ```

@@ -63,9 +63,6 @@ func NewDB() (*DataBase, error) {
 		log.Println("NewDB error: ", err.Error())
 		return nil, err
 	}
-
-	log.Println("Successfully created admin")
-
 	for _, u := range db.Users {
 		// Update nextUserId, nextBookId of DataBase state and
 		// update BooksOwns property because while doing backup and unmarshalling
@@ -84,18 +81,23 @@ func NewDB() (*DataBase, error) {
 		}
 		db.nextBookId = int(math.Max(float64(b.Id), float64(db.nextBookId)+1))
 	}
-	// Create a demo admin
-	err = db.Users.CreateAdmin()
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
-	}
-
 	// Activate the Backup Scheduler.
 	// It will back up DataBase data after every certain amount of time.
-	db.DbBackupScheduler()
-
+	err = db.DbBackupScheduler()
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return &db, nil
+}
+
+// AddAdmin adds an admin with username and password
+func (d *DataBase) AddAdmin(username, password string) error {
+	err := db.Users.CreateAdmin(username, password)
+	if err != nil {
+		return err
+	}
+	err = db.DbBackup()
+	return err
 }
 
 // NewTestDb initiates db for testing purpose
@@ -107,7 +109,10 @@ func NewTestDb() *DataBase {
 		nextBookId: 101,
 		jobDelay:   time.Second * 20,
 	}
-	db.Users.CreateAdmin()
+	err := db.AddAdmin("imtiaz", "1234")
+	if err != nil {
+		log.Println(err.Error())
+	}
 	return &db
 }
 
@@ -158,7 +163,6 @@ func (d *DataBase) DbBackupScheduler() error {
 	}, db.jobDelay /* db.jobDelay is the timer for scheduled job */)
 
 	if err != nil {
-		log.Print("Task scheduler didn't successfully started")
 		return err
 	}
 	log.Print("Task has been scheduled successfully.")

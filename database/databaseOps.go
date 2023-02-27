@@ -35,8 +35,8 @@ func (d *DataBase) GetUserByUserName(username string) ([]byte, error) {
 
 // UpdateUserByUserName updates a user record from the database.
 // Returns error if any error occurs otherwise return nil
-func (d *DataBase) UpdateUserByUserName(username string, body []byte) error {
-	err := d.Users.UpdateUser(username, body)
+func (d *DataBase) UpdateUserByUserName(username, requestedUser string, body []byte) error {
+	err := d.Users.UpdateUser(username, requestedUser, body)
 	return err
 }
 
