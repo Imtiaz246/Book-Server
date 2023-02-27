@@ -56,5 +56,5 @@ func UserRoutes(r chi.Router) {
 	r.Get("/", controllers.GetUserList)
 	r.Get("/{username}", controllers.GetUser)
 	r.Get("/{username}/books", controllers.GetBooksOfUser)
-	r.Post("/get-token", controllers.GetToken)
+	r.Post("/token", controllers.GetToken)
 }
