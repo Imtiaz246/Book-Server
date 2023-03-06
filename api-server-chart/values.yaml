@@ -1,0 +1,21 @@
+deployments:
+  # if nameOverWriteWithReleaseName is true then deployments
+  # name will be changed to .Release.Name
+  nameOverWriteWithReleaseName: true
+  name: api-server-deployments
+  replicas: 3
+  container:
+    name: api-server
+    image: imtiazcho/book-server
+    port: 3000
+
+
+secrets:
+  name: env-secrets
+  data:
+    adminUsername: admin
+    adminPassword: password
+
+services:
+
+

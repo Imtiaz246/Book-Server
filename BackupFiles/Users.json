@@ -1,1 +1,1 @@
-{"For volume 9":{"id":1002,"role":"user","name":"","email":"xyz@gmail.com","username":"For volume 9","password":"1234","organization":"Appscode Ltd"},"admin":{"id":100,"role":"admin","name":"","email":"xyz@gmail.com","username":"admin","password":"12345","organization":"Appscode Ltd"}}
+{"For volume 9":{"id":1002,"role":"user","name":"","email":"xyz@gmail.com","username":"For volume 9","password":"1234","organization":"Appscode Ltd"},"admin":{"id":100,"role":"admin","name":"","email":"","username":"admin","password":"1234","organization":""}}
