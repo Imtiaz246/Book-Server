@@ -33,3 +33,6 @@
 
 12. Get a jwt token
 - curl -v -H "Content-type: application/json" -d '{ "username": "imtiaz", "password": "1234" }' http://localhost:3000/api/v1/users/get-token
+
+13. Check the health of the server
+- curl -v -H "Content-type: application/json" http://localhost:3000/api/v1/ping
