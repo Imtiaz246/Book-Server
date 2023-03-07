@@ -3,11 +3,17 @@ deployments:
   # name will be changed to .Release.Name
   nameOverWriteWithReleaseName: true
   name: api-server-deployments
+  version: v0.1.0
   replicas: 3
   container:
     name: api-server
     image: imtiazcho/book-server
     port: 3000
+    livenessProbePath: /api/v1/ping
+
+
+labels:
+  app: book-api-server
 
 
 secrets:
@@ -17,5 +23,9 @@ secrets:
     adminPassword: password
 
 services:
+  name: book-server-service
+  port: 80
+  targetPort: 3000
+  nodePort: 30100
 
 

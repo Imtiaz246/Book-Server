@@ -21,6 +21,8 @@ func Router() http.Handler {
 	r.Route("/api/v1/books", BookRoutes)
 	// User APIS
 	r.Route("/api/v1/users", UserRoutes)
+	// Ping routes
+	r.Get("/api/v1/ping", controllers.Ping)
 
 	return r
 }

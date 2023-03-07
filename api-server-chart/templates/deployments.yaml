@@ -2,3 +2,46 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   {{- include "setDeploymentName" . | indent 2 }}
+  labels:
+    {{- include "attachLabels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.deployments.replicas }}
+  selector:
+    matchLabels:
+      {{- include "attachLabels" . | indent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        {{- include "attachLabels" . | indent 8 }}
+    spec:
+      containers:
+        - name: {{ .Values.deployments.container.name }}
+          image: {{ .Values.deployments.container.image }}
+          ports:
+            - containerPort: {{ .Values.deployments.container.port }}
+          # Resources required to run the container.
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128M"
+            limits:
+              cpu: "500m"
+              memory: "128M"
+          # To check livenessProbe of the container.
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.deployments.container.port }}
+              path: {{ .Values.deployments.container.livenessProbePath }}
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            failureThreshold: 3
+          # Environment variables of the containers.
+
+
+
