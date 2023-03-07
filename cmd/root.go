@@ -35,7 +35,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 0, "port no for the server to run")
+	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 3000, "port no for the server to run")
 }
 
 func startServer() {

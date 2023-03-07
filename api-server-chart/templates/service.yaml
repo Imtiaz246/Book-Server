@@ -1,14 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.services.name }}
+  name: {{ .Values.service.name }}
   labels:
-    name: {{ .Values.services.name }}
+    name: {{ .Values.service.name }}
 spec:
   type: NodePort
   selector:
     {{- include "attachLabels" . | indent 4 }}
   ports:
-    - port: {{ .Values.services.port }}
-      targetPort: {{ .Values.services.targetPort }}
-      nodePort: {{ .Values.services.nodePort }}
+    - protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      nodePort: {{ .Values.service.nodePort }}

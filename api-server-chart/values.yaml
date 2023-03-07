@@ -18,14 +18,19 @@ labels:
 
 secrets:
   name: env-secrets
+  namespace: default
   data:
     adminUsername: admin
     adminPassword: password
 
-services:
+service:
   name: book-server-service
-  port: 80
+  port: 8080
   targetPort: 3000
   nodePort: 30100
+
+ingress:
+  host: myapp.com
+  name: book-server-ingress
 
 

@@ -42,6 +42,17 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
           # Environment variables of the containers.
+          env:
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: ADMIN_USERNAME
+                  name: {{ .Values.secrets.name }}
 
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: ADMIN_PASSWORD
+                  name: {{ .Values.secrets.name }}
 
 
