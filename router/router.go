@@ -5,6 +5,7 @@ import (
 	"github.com/Imtiaz246/Book-Server/middlewares"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
@@ -17,9 +18,10 @@ func Router() http.Handler {
 	// Add common Header for all routes
 	r.Use(middlewares.AddHeaders)
 
-	// Book APIS
+	r.Handle("/metrics", promhttp.Handler())
+	// Book routes
 	r.Route("/api/v1/books", BookRoutes)
-	// User APIS
+	// User routes
 	r.Route("/api/v1/users", UserRoutes)
 	// Ping routes
 	r.Get("/api/v1/ping", controllers.Ping)
