@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Imtiaz246/Book-Server/database"
 	"github.com/Imtiaz246/Book-Server/router"
+	"github.com/Imtiaz246/Book-Server/utils"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"log"
@@ -36,6 +37,7 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 3000, "port no for the server to run")
+	utils.RegisterMetrics()
 }
 
 func startServer() {

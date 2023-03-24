@@ -17,7 +17,7 @@ func Router() http.Handler {
 	r.Use(middleware.Logger)
 	// Add common Header for all routes
 	r.Use(middlewares.AddHeaders)
-
+	// Opens /metrics endpoint for prometheus
 	r.Handle("/metrics", promhttp.Handler())
 	// Book routes
 	r.Route("/api/v1/books", BookRoutes)
